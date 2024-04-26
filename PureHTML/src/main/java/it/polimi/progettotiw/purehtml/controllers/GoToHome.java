@@ -1,9 +1,14 @@
 package it.polimi.progettotiw.purehtml.controllers;
 
+import it.polimi.progettotiw.purehtml.beans.Group;
+import it.polimi.progettotiw.purehtml.beans.User;
+import it.polimi.progettotiw.purehtml.dao.GroupDAO;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -13,6 +18,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class GoToHome
@@ -51,8 +57,32 @@ public class GoToHome extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        List<String> titlesCreatedGroups = null;
+        List<String> titlesParticipatingGroups = null;
+        GroupDAO groupDAO = new GroupDAO(connection);
+
+        try {
+            titlesCreatedGroups = groupDAO.getTitlesCreatedGroups(user.getUsername());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+
+        try {
+            titlesParticipatingGroups = groupDAO.getTitlesPartecipatingGroups(user.getUsername());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+
         String pathToResource = "WEB-INF/home.jsp";
         RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
+        request.setAttribute("titlesCreatedGroups", titlesCreatedGroups);
+        request.setAttribute("titlesParticipatingGroups", titlesParticipatingGroups);
         dispatcher.forward(request, response);
     }
 

@@ -36,6 +36,7 @@
     <filter-mapping>
         <filter-name>LoginChecker</filter-name>
         <url-pattern>/GoToHome</url-pattern>
+        <url-pattern>/CreateGroup</url-pattern>
     </filter-mapping>
 
     <welcome-file-list>

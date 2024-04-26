@@ -91,6 +91,8 @@ public class CheckLogin extends HttpServlet {
             response.sendRedirect(redirectionPath);
         } else {
             System.out.println("Login was not successful");
+            request.setAttribute("username", username);
+            request.setAttribute("password", password);
             request.setAttribute("errorMessage", "Username o password errati");
             request.getRequestDispatcher("/index.jsp").forward(request, response);
         }

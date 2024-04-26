@@ -17,11 +17,11 @@
     <form method="post" action="${loginUrl}">
       <div class="form-group bottom-margin">
         <label for="username">Inserisci il tuo username</label>
-        <input id="username" type="text" name="username" placeholder="Username" required>
+        <input id="username" type="text" name="username" placeholder="Username" required value="${requestScope.username}">
       </div>
       <div class="form-group bottom-margin">
         <label for="password">Inserisci la tua password</label>
-        <input id="password" type="password" placeholder="Password" name="password" required />
+        <input id="password" type="password" placeholder="Password" name="password" required value="${requestScope.password}">
       </div>
       <c:if test="${not empty requestScope.errorMessage}">
         <div id="error-message" class="error-message bottom-margin">

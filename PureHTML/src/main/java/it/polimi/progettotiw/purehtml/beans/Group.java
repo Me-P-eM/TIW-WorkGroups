@@ -1,15 +1,23 @@
 package it.polimi.progettotiw.purehtml.beans;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Group {
+    private int groupID;
     private String creator;
-    private int id;
+    private String title;
+    private Date creation;
+    private int activity;
     private int min;
     private int max;
-    private String title;
-    private int activity;
-    private LocalDate creation;
+
+    public int getGroupID() {
+        return groupID;
+    }
+
+    public void setGroupID(int groupID) {
+        this.groupID = groupID;
+    }
 
     public String getCreator() {
         return creator;
@@ -19,12 +27,28 @@ public class Group {
         this.creator = creator;
     }
 
-    public int getId() {
-        return id;
+    public String getTitle() {
+        return title;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Date getCreation() {
+        return creation;
+    }
+
+    public void setCreation(Date creation) {
+        this.creation = creation;
+    }
+
+    public int getActivity() {
+        return activity;
+    }
+
+    public void setActivity(int activity) {
+        this.activity = activity;
     }
 
     public int getMin() {
@@ -41,29 +65,5 @@ public class Group {
 
     public void setMax(int max) {
         this.max = max;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public int getActivity() {
-        return activity;
-    }
-
-    public void setActivity(int activity) {
-        this.activity = activity;
-    }
-
-    public LocalDate getCreation() {
-        return creation;
-    }
-
-    public void setCreation(LocalDate creation) {
-        this.creation = creation;
     }
 }

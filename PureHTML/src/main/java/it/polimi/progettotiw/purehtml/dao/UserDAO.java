@@ -22,7 +22,7 @@ public class UserDAO {
      * @throws SQLException
      */
     public User checkCredentials(String username, String password) throws SQLException {
-        String query = "SELECT userID, name, surname, email FROM user WHERE userID=? AND password=?";
+        String query = "SELECT userID, name, surname, email FROM `user` WHERE userID=? AND password=?";
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, username);
             p.setString(2, password);

@@ -39,6 +39,14 @@
     background-color: #f0f0f0;
 }
 
+.table-head {
+    background-color: #dddddd;
+}
+
+.table-bordered {
+    border: 2px solid #dee2e6;
+}
+
 .selected-in-table {
     background-color: #ccffb3;
 }
