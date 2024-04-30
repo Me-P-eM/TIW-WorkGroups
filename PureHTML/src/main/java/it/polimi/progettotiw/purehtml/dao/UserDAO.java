@@ -22,7 +22,10 @@ public class UserDAO {
      * @throws SQLException
      */
     public User checkCredentials(String username, String password) throws SQLException {
-        String query = "SELECT userID, name, surname, email FROM `user` WHERE userID=? AND password=?";
+        String query =
+                "SELECT userID, name, surname, email " +
+                "FROM `user` " +
+                "WHERE userID=? AND password=?";
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, username);
             p.setString(2, password);
@@ -56,7 +59,10 @@ public class UserDAO {
      * @throws SQLException
      */
     public boolean checkUsername(String username) throws SQLException {
-        String query = "SELECT userID FROM user WHERE userID=?";
+        String query =
+                "SELECT userID " +
+                "FROM `user` " +
+                "WHERE userID=?";
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, username);
             try (ResultSet result = p.executeQuery()) {
@@ -82,7 +88,10 @@ public class UserDAO {
      * @throws SQLException
      */
     public boolean checkEmail(String email) throws SQLException {
-        String query = "SELECT email FROM user WHERE email=?";
+        String query =
+                "SELECT email " +
+                "FROM `user` " +
+                "WHERE email=?";
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, email);
             try (ResultSet result = p.executeQuery()) {
@@ -107,7 +116,9 @@ public class UserDAO {
      * @throws SQLException
      */
     public User registerUser(String username, String name, String surname, String email, String password) throws SQLException {
-        String query = "INSERT INTO user (userID, name, surname, email, password) VALUES (?, ?, ?, ?, ?)";
+        String query =
+                "INSERT INTO `user` (userID, name, surname, email, password) " +
+                "VALUES (?, ?, ?, ?, ?)";
         try {
             connection.setAutoCommit(false);
             PreparedStatement p = connection.prepareStatement(query);

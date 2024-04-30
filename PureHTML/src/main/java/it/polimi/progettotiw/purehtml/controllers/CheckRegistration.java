@@ -20,14 +20,16 @@ import it.polimi.progettotiw.purehtml.util.ParameterChecker;
 import org.apache.commons.validator.routines.EmailValidator;
 
 /**
- * Servlet implementation class CheckLogin
+ * Servlet implementation class CheckRegistration
  */
 @WebServlet("/CheckRegistration")
 public class CheckRegistration extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
     private Connection connection;
 
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
     public CheckRegistration() {
         super();
         // TODO Auto-generated constructor stub
@@ -63,13 +65,7 @@ public class CheckRegistration extends HttpServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession s = request.getSession(true);
-        String name;
-        String surname;
-        String username;
-        String email;
-        String password;
-        String passwordCheck;
+        // check parameters
         if (!ParameterChecker.checkString(request.getParameter("name"))
                 || !ParameterChecker.checkString(request.getParameter("surname"))
                 || !ParameterChecker.checkString(request.getParameter("username"))
@@ -80,24 +76,26 @@ public class CheckRegistration extends HttpServlet {
             return;
         }
 
-        name = request.getParameter("name");
-        surname = request.getParameter("surname");
-        username = request.getParameter("username");
-        email = request.getParameter("email");
-        password = request.getParameter("password");
-        passwordCheck = request.getParameter("passwordCheck");
-
+        HttpSession s = request.getSession(true);
+        String name = request.getParameter("name");
+        String surname = request.getParameter("surname");
+        String username = request.getParameter("username");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String passwordCheck = request.getParameter("passwordCheck");
         UserDAO userDao = new UserDAO(connection);
         User u = null;
         boolean usernameExists;
-        // Check username
+
+        // check username
         try {
             usernameExists = userDao.checkUsername(username);
         } catch (SQLException e) {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Couldn't perform database interrogation");
             return;
         }
-        // Check email
+
+        // check email
         boolean validEmail;
         boolean emailExists = true;
         validEmail = EmailValidator.getInstance(true).isValid(email);
@@ -110,9 +108,10 @@ public class CheckRegistration extends HttpServlet {
             }
         }
 
-        // Check password
+        // check password
         boolean validPassword = password.equals(passwordCheck);
-        // OK
+
+        // if everything is correct, try register user in the database
         if (!usernameExists && !emailExists && validPassword) {
             try {
                 u = userDao.registerUser(username, name, surname, email, password);
@@ -122,11 +121,14 @@ public class CheckRegistration extends HttpServlet {
             }
         }
 
+        // registration went OK
         if (u != null) {
             s.setAttribute("user", u);
             System.out.print("Setting http session ...\n");
             String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
             response.sendRedirect(redirectionPath);
+
+        // registration was not possible due to parameters problems
         } else {
             System.out.println("Registration was not successful");
             if (usernameExists) {

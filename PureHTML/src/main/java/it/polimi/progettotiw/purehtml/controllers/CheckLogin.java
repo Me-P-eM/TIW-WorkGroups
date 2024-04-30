@@ -24,9 +24,11 @@ import it.polimi.progettotiw.purehtml.util.ParameterChecker;
 @WebServlet("/CheckLogin")
 public class CheckLogin extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
     private Connection connection;
 
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
     public CheckLogin() {
         super();
         // TODO Auto-generated constructor stub
@@ -62,21 +64,20 @@ public class CheckLogin extends HttpServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession s = request.getSession(true);
-        String username;
-        String password;
+        // check parameters
         if (!ParameterChecker.checkString(request.getParameter("username"))
                 || !ParameterChecker.checkString(request.getParameter("password"))) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
             return;
         }
 
-        username = request.getParameter("username");
-        password = request.getParameter("password");
-
+        HttpSession s = request.getSession(true);
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
         UserDAO userDao = new UserDAO(connection);
         User u = null;
 
+        // check credentials
         try {
             u = userDao.checkCredentials(username, password);
         } catch (SQLException e) {
@@ -84,11 +85,14 @@ public class CheckLogin extends HttpServlet {
             return;
         }
 
+        // if user is authenticated
         if (u != null) {
             s.setAttribute("user", u);
             System.out.print("Setting http session ...\n");
             String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
             response.sendRedirect(redirectionPath);
+
+        //if user is not authenticated
         } else {
             System.out.println("Login was not successful");
             request.setAttribute("username", username);

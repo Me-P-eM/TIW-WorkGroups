@@ -1,12 +1,15 @@
 package it.polimi.progettotiw.purehtml.beans;
 
-import java.util.Date;
+import java.time.LocalDate;
 
+/**
+ * Group info
+ */
 public class Group {
     private int groupID;
     private String creator;
     private String title;
-    private Date creation;
+    private LocalDate creation;
     private int activity;
     private int min;
     private int max;
@@ -35,11 +38,11 @@ public class Group {
         this.title = title;
     }
 
-    public Date getCreation() {
+    public LocalDate getCreation() {
         return creation;
     }
 
-    public void setCreation(Date creation) {
+    public void setCreation(LocalDate creation) {
         this.creation = creation;
     }
 
