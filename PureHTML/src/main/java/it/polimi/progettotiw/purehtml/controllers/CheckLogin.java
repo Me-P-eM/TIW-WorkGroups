@@ -88,7 +88,7 @@ public class CheckLogin extends HttpServlet {
         // if user is authenticated
         if (u != null) {
             s.setAttribute("user", u);
-            System.out.print("Setting http session ...\n");
+            System.out.println("Setting http session ...");
             String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
             response.sendRedirect(redirectionPath);
 

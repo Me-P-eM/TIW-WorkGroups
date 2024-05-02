@@ -91,12 +91,65 @@
                     </c:otherwise>
                 </c:choose>
             </div>
-            <c:url value="/CreateGroup" var="createUrl" />
-            <form method="post" action="${createUrl}">
-                <div class="text-center">
-                    <div class="bottom-margin">
-                        <button type="submit" class="btn btn-outline-primary">CREA</button>
+            <p class="text-center text-decoration-underline top-margin">Per creare un gruppo, compila i seguenti campi:</p>
+            <c:url value="/CheckGroupParameters" var="checkGroupParametersUrl" />
+            <form method="post" action="${checkGroupParametersUrl}">
+                <div class="text-center row bottom-margin lateral-margin">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="title">Inserisci il titolo del gruppo</label>
+                            <br>
+                            <input id="title" type="text" name="title" placeholder="Titolo" required value="${requestScope.title}">
+                        </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="activity">Inserisci la durata di attività del gruppo (in giorni)</label>
+                            <br>
+                            <input id="activity" type="number" name="activity" placeholder="Attività" min="1" step="1" required value="${requestScope.activity}">
+                        </div>
+                    </div>
+                </div>
+                <c:if test="${not empty requestScope.errorMessageTitle}">
+                    <div class="text-center row lateral-margin">
+                        <div class="col-md-6">
+                            <div id="error-message-title" class="error-message">
+                                <p><c:out value="${requestScope.errorMessageTitle}" /></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                        </div>
+                    </div>
+                </c:if>
+                <div class="text-center row lateral-margin">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="min">Inserisci il numero minimo di invitati</label>
+                            <br>
+                            <input id="min" type="number" name="min" placeholder="Minimo"  min="1" step="1" required value="${requestScope.min}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="max">Inserisci il numero massimo di invitati</label>
+                            <br>
+                            <input id="max" type="number" name="max" placeholder="Massimo"  min="1" step="1" required value="${requestScope.max}">
+                        </div>
+                    </div>
+                </div>
+                <c:if test="${not empty requestScope.errorMessageMin}">
+                <div class="text-center row lateral-margin">
+                    <div class="col-md-6">
+                        <div id="error-message-max" class="error-message">
+                            <p><c:out value="${requestScope.errorMessageMin}" /></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    </div>
+                </div>
+                </c:if>
+                <div class="text-center top-margin">
+                    <button type="submit" class="btn btn-outline-primary">INVIA</button>
                 </div>
             </form>
         </div>

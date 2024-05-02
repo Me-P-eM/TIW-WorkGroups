@@ -61,18 +61,23 @@ public class GetGroupDetails extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int groupID;
         // check parameters
         if (!ParameterChecker.checkString(request.getParameter("groupID"))) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
             return;
         }
+        try {
+            groupID = Integer.parseInt(request.getParameter("groupID"));
+        } catch(NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The id you submitted for the group is not a number");
+            return;
+        }
 
         HttpSession session = request.getSession();
-        int groupID;
         User user = (User) session.getAttribute("user");
         boolean isParticipant;
         User creator = new User();
-        groupID = Integer.parseInt(request.getParameter("groupID"));
         Group group = new Group();
         List<User> invitees = new ArrayList<>();
         GroupDAO groupDAO = new GroupDAO(connection);
@@ -124,7 +129,7 @@ public class GetGroupDetails extends HttpServlet {
 
         // if he's not a participant, he can't access group details
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have access to the group details");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have access to details of this group, or this group does not exists");
         }
     }
 

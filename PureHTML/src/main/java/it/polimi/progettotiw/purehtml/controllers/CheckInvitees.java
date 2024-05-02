@@ -1,6 +1,5 @@
 package it.polimi.progettotiw.purehtml.controllers;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -14,17 +13,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Servlet implementation class CreateGroup
+ * Servlet implementation class CheckInvitees
  */
-@WebServlet("/CreateGroup")
-public class CreateGroup extends HttpServlet {
+@WebServlet("/CheckInvitees")
+public class CheckInvitees extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CreateGroup() {
+    public CheckInvitees() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -52,17 +51,13 @@ public class CreateGroup extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathToResource = "WEB-INF/groupCreation.jsp";
-        RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
-        dispatcher.forward(request, response);
+
     }
 
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathToResource = "WEB-INF/groupCreation.jsp";
-        RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
-        dispatcher.forward(request, response);
+
     }
 }

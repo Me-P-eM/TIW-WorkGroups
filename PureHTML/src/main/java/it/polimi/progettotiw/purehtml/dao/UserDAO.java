@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import it.polimi.progettotiw.purehtml.beans.User;
 
@@ -108,6 +110,35 @@ public class UserDAO {
             e.printStackTrace();
             throw new SQLException(e);
         }
+    }
+
+    /**
+     * This method gets all users except one specific
+     * @return a list of users
+     * @throws SQLException
+     */
+    public List<User> getAllUsersExceptOne(String userID) throws SQLException {
+        String query =
+                "SELECT name, surname " +
+                "FROM `user` " +
+                "WHERE userID<>? " +
+                "ORDER BY surname ASC";
+        List<User> users = new ArrayList<>();
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setString(1, userID);
+            try (ResultSet result = p.executeQuery()) {
+                while (result.next()) {
+                    User user = new User();
+                    user.setName(result.getString("name"));
+                    user.setSurname(result.getString("surname"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
+        }
+        return users;
     }
 
     /**

@@ -71,7 +71,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="text-center">
                 <c:url value="GoToHome" var="homeUrl" />
                 <a href="${homeUrl}" class="btn btn-outline-danger">INDIETRO</a>
