@@ -59,42 +59,15 @@ public class GoToRegistry extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int activity, min, max;
+        HttpSession session = request.getSession();
         // check parameters
-        if (!ParameterChecker.checkString(request.getParameter("title"))
-                || !ParameterChecker.checkString(request.getParameter("activity"))
-                || !ParameterChecker.checkString(request.getParameter("min"))
-                || !ParameterChecker.checkString(request.getParameter("max"))) {
+        if (session.getAttribute("group") == null || session.getAttribute("attempts") == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
             return;
         }
-        try {
-            activity = Integer.parseInt(request.getParameter("activity"));
-        } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The days of activity you submitted for the group is not a number");
-            return;
-        }
-        try {
-            min = Integer.parseInt(request.getParameter("min"));
-        } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The minimum participants you submitted for the group is not a number");
-            return;
-        }
-        try {
-            max = Integer.parseInt(request.getParameter("max"));
-        } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The maximum participants you submitted for the group is not a number");
-            return;
-        }
-        if (min > max) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The minimum number of participants can't be grater than maximum");
-            return;
-        }
 
-        String title = request.getParameter("title");
-        List<User> users = new ArrayList<>();
-        HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+        List<User> users = new ArrayList<>();
         UserDAO userDAO = new UserDAO(connection);
 
         // get all users
@@ -109,11 +82,15 @@ public class GoToRegistry extends HttpServlet {
         // go to registry page
         String pathToResource = "WEB-INF/registry.jsp";
         RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
-        request.setAttribute("title", title);
-        request.setAttribute("activity", activity);
-        request.setAttribute("min", min);
-        request.setAttribute("max", max);
         request.setAttribute("users", users);
+        if (ParameterChecker.checkString(request.getParameter("errorMessage"))) {
+            request.setAttribute("errorMessage", request.getParameter("errorMessage"));
+        }
+        if (session.getAttribute("selectedUsers") != null) {
+            String[] selectedUsers = (String[]) session.getAttribute("selectedUsers");
+            session.removeAttribute("selectedUsers");
+            request.setAttribute("selectedUsers", selectedUsers);
+        }
         dispatcher.forward(request, response);
     }
 

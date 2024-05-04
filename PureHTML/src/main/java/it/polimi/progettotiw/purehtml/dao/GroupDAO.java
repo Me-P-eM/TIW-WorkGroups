@@ -202,4 +202,63 @@ public class GroupDAO {
             throw new SQLException(e);
         }
     }
+
+    /**
+     * This method stores the group in the database
+     * @param group the group
+     * @param invitees people invited to the group
+     * @throws SQLException
+     */
+    public void createGroupAndSetInvitation(Group group, List<String> invitees) throws SQLException {
+        String query =
+                "INSERT INTO `group` (creator, title, creation, activity, min, max) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement p = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            p.setString(1, group.getCreator());
+            p.setString(2, group.getTitle());
+            p.setDate(3, Date.valueOf(group.getCreation()));
+            p.setInt(4, group.getActivity());
+            p.setInt(5, group.getMin());
+            p.setInt(6, group.getMax());
+            int rowsAffected = p.executeUpdate();
+            if (rowsAffected == 1) {
+                ResultSet generatedKeys = p.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int groupID = generatedKeys.getInt(1);
+                    setInvitees(invitees, groupID);
+                    connection.commit();
+                } else {
+                    throw new SQLException("Failed to retrieve groupID for the newly created group");
+                }
+            } else {
+                throw new SQLException("Failed to create group: no rows affected");
+            }
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+
+    private void setInvitees(List<String> invitees, int groupID) throws SQLException {
+        String query =
+                "INSERT INTO invitation (userID, groupID)" +
+                "VALUES (?, ?)";
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            for (String invitee : invitees) {
+                p.setString(1, invitee);
+                p.setInt(2, groupID);
+                p.addBatch();
+            }
+            p.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
 }

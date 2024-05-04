@@ -73,6 +73,10 @@ public class GetGroupDetails extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The id you submitted for the group is not a number");
             return;
         }
+        if (groupID < 1) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            return;
+        }
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");

@@ -124,14 +124,14 @@
                 <div class="text-center row lateral-margin">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="min">Inserisci il numero minimo di invitati</label>
+                            <label for="min">Inserisci il numero minimo di partecipanti</label>
                             <br>
                             <input id="min" type="number" name="min" placeholder="Minimo"  min="1" step="1" required value="${requestScope.min}">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="max">Inserisci il numero massimo di invitati</label>
+                            <label for="max">Inserisci il numero massimo di partecipanti</label>
                             <br>
                             <input id="max" type="number" name="max" placeholder="Massimo"  min="1" step="1" required value="${requestScope.max}">
                         </div>

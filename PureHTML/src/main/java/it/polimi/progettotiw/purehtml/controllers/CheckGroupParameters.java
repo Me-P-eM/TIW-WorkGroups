@@ -99,11 +99,17 @@ public class CheckGroupParameters extends HttpServlet {
 
         // if the number consistency constraint is respected and the title contains valid characters, go to registry page
         if (min <= max && !ParameterChecker.containsInvalidCharacters(title)) {
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
+            session.setAttribute("attempts", 0);
+            Group group = new Group();
+            group.setCreator(user.getUsername());
+            group.setTitle(title);
+            group.setActivity(activity);
+            group.setMin(min);
+            group.setMax(max);
+            session.setAttribute("group", group);
             String redirectionPath = getServletContext().getContextPath() + "/GoToRegistry";
-            redirectionPath += "?title=" + title;
-            redirectionPath += "&activity=" + activity;
-            redirectionPath += "&min=" + min;
-            redirectionPath += "&max=" + max;
             response.sendRedirect(redirectionPath);
 
         // if the minimum number of participants is greater than the maximum number or the title contains invalid characters, reload the home page showing errors

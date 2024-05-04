@@ -34,6 +34,11 @@
     background-color: #dddddd;
 }
 
+.align-middle-center {
+    vertical-align: middle;
+    text-align: center;
+}
+
 .table-bordered {
     border: 2px solid #dee2e6;
 }

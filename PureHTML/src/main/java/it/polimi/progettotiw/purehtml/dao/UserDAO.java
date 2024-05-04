@@ -119,7 +119,7 @@ public class UserDAO {
      */
     public List<User> getAllUsersExceptOne(String userID) throws SQLException {
         String query =
-                "SELECT name, surname " +
+                "SELECT userID, name, surname " +
                 "FROM `user` " +
                 "WHERE userID<>? " +
                 "ORDER BY surname ASC";
@@ -129,6 +129,7 @@ public class UserDAO {
             try (ResultSet result = p.executeQuery()) {
                 while (result.next()) {
                     User user = new User();
+                    user.setUsername(result.getString("userID"));
                     user.setName(result.getString("name"));
                     user.setSurname(result.getString("surname"));
                     users.add(user);
@@ -172,9 +173,10 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             connection.rollback();
-            connection.setAutoCommit(true);
             e.printStackTrace();
             throw e;
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 }
