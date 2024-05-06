@@ -46,7 +46,7 @@ public class CheckLogin extends HttpServlet {
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new UnavailableException("Could't load database driver");
+            throw new UnavailableException("Couldn't load database driver");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UnavailableException("Couldn't connect to the database");
@@ -75,7 +75,7 @@ public class CheckLogin extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         UserDAO userDao = new UserDAO(connection);
-        User u = null;
+        User u;
 
         // check credentials
         try {

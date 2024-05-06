@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -50,7 +49,7 @@ public class GetGroupDetails extends HttpServlet {
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new UnavailableException("Could't load database driver");
+            throw new UnavailableException("Couldn't load database driver");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UnavailableException("Couldn't connect to the database");
@@ -81,9 +80,9 @@ public class GetGroupDetails extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         boolean isParticipant;
-        User creator = new User();
-        Group group = new Group();
-        List<User> invitees = new ArrayList<>();
+        User creator;
+        Group group;
+        List<User> invitees;
         GroupDAO groupDAO = new GroupDAO(connection);
 
         // check if the user of the session is a participant of the selected group

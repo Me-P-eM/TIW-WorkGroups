@@ -10,7 +10,7 @@ import java.util.List;
 import it.polimi.progettotiw.purehtml.beans.User;
 
 public class UserDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public UserDAO(Connection connection) {
         this.connection = connection;
@@ -33,17 +33,15 @@ public class UserDAO {
             p.setString(2, password);
             try (ResultSet result = p.executeQuery()) {
                 User u = null;
-                if (!result.isBeforeFirst()) {
-                    return u;
-                } else {
+                if (result.isBeforeFirst()) {
                     result.next();
                     u = new User();
                     u.setUsername(result.getString("userID"));
                     u.setName(result.getString("name"));
                     u.setSurname(result.getString("surname"));
                     u.setEmail(result.getString("email"));
-                    return u;
                 }
+                return u;
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new SQLException(e);

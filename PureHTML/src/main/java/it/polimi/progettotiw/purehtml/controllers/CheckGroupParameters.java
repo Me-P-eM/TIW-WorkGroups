@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +48,7 @@ public class CheckGroupParameters extends HttpServlet {
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new UnavailableException("Could't load database driver");
+            throw new UnavailableException("Couldn't load database driver");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UnavailableException("Couldn't connect to the database");
@@ -97,10 +96,10 @@ public class CheckGroupParameters extends HttpServlet {
 
         String title = request.getParameter("title");
 
-        // if the number consistency constraint is respected and the title contains valid characters, go to registry page
-        if (min <= max && !ParameterChecker.containsInvalidCharacters(title)) {
-            HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("user");
+        // if the number consistency constraint is respected, go to registry page
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (min <= max) {
             session.setAttribute("attempts", 0);
             Group group = new Group();
             group.setCreator(user.getUsername());
@@ -112,12 +111,10 @@ public class CheckGroupParameters extends HttpServlet {
             String redirectionPath = getServletContext().getContextPath() + "/GoToRegistry";
             response.sendRedirect(redirectionPath);
 
-        // if the minimum number of participants is greater than the maximum number or the title contains invalid characters, reload the home page showing errors
+        // if the minimum number of participants is greater than the maximum number, reload the home page showing errors
         } else {
-            HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("user");
-            List<Group> createdGroups = new ArrayList<>();
-            List<Group> invitedGroups = new ArrayList<>();
+            List<Group> createdGroups;
+            List<Group> invitedGroups;
             GroupDAO groupDAO = new GroupDAO(connection);
             // get the list of groups which the user of the session has created
             try {
@@ -141,12 +138,7 @@ public class CheckGroupParameters extends HttpServlet {
             request.setAttribute("activity", activity);
             request.setAttribute("min", min);
             request.setAttribute("max", max);
-            if (min > max) {
-                request.setAttribute("errorMessageMin", "Il numero minimo non può essere maggiore del numero massimo");
-            }
-            if (ParameterChecker.containsInvalidCharacters(title)) {
-                request.setAttribute("errorMessageTitle", "Il titolo non deve includere: \\ : / ? & = # + e spazi vuoti");
-            }
+            request.setAttribute("errorMessageMin", "Il numero minimo non può essere maggiore del numero massimo");
             String pathToResource = "WEB-INF/home.jsp";
             RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
             dispatcher.forward(request, response);

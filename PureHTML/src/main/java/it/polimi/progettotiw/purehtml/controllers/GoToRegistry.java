@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public class GoToRegistry extends HttpServlet {
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new UnavailableException("Could't load database driver");
+            throw new UnavailableException("Couldn't load database driver");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UnavailableException("Couldn't connect to the database");
@@ -67,7 +66,7 @@ public class GoToRegistry extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        List<User> users = new ArrayList<>();
+        List<User> users;
         UserDAO userDAO = new UserDAO(connection);
 
         // get all users

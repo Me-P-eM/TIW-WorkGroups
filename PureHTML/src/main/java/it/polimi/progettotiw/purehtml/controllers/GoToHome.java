@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -49,7 +48,7 @@ public class GoToHome extends HttpServlet {
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            throw new UnavailableException("Could't load database driver");
+            throw new UnavailableException("Couldn't load database driver");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UnavailableException("Couldn't connect to the database");
@@ -62,8 +61,8 @@ public class GoToHome extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        List<Group> createdGroups = new ArrayList<>();
-        List<Group> invitedGroups = new ArrayList<>();
+        List<Group> createdGroups;
+        List<Group> invitedGroups;
         GroupDAO groupDAO = new GroupDAO(connection);
 
         // get the list of groups which the user of the session has created

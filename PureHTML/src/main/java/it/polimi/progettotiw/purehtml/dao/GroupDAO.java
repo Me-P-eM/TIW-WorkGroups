@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public GroupDAO(Connection connection) {
         this.connection = connection;
@@ -90,9 +90,7 @@ public class GroupDAO {
             p.setInt(1, groupID);
             try (ResultSet result = p.executeQuery()) {
                 Group group = null;
-                if (!result.isBeforeFirst()) {
-                    return group;
-                } else {
+                if (result.isBeforeFirst()) {
                     result.next();
                     group = new Group();
                     group.setCreator(result.getString("creator"));
@@ -101,8 +99,8 @@ public class GroupDAO {
                     group.setActivity(result.getInt("activity"));
                     group.setMin(result.getInt("min"));
                     group.setMax(result.getInt("max"));
-                    return group;
                 }
+                return group;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -125,15 +123,13 @@ public class GroupDAO {
             p.setInt(1, groupID);
             try (ResultSet result = p.executeQuery()) {
                 User creator = null;
-                if (!result.isBeforeFirst()) {
-                    return creator;
-                } else {
+                if (result.isBeforeFirst()) {
                     result.next();
                     creator = new User();
                     creator.setName(result.getString("name"));
                     creator.setSurname(result.getString("surname"));
-                    return creator;
                 }
+                return creator;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -204,7 +200,7 @@ public class GroupDAO {
     }
 
     /**
-     * This method stores the group in the database
+     * This method stores the group in the database and sets invitees to that group
      * @param group the group
      * @param invitees people invited to the group
      * @throws SQLException
@@ -244,7 +240,13 @@ public class GroupDAO {
         }
     }
 
-    private void setInvitees(List<String> invitees, int groupID) throws SQLException {
+    /**
+     * This method sets invitees to a specific group
+     * @param invitees a list of usernames of invitees
+     * @param groupID the id of the group
+     * @throws SQLException
+     */
+    public void setInvitees(List<String> invitees, int groupID) throws SQLException {
         String query =
                 "INSERT INTO invitation (userID, groupID)" +
                 "VALUES (?, ?)";
