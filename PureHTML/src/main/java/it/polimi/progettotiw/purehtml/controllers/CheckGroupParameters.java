@@ -93,6 +93,16 @@ public class CheckGroupParameters extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The maximum you submitted for the group is not a number");
             return;
         }
+        if (activity < 1) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            return;
+        } else if (min < 1) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            return;
+        } else if (max < 1) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            return;
+        }
 
         String title = request.getParameter("title");
 
@@ -138,7 +148,7 @@ public class CheckGroupParameters extends HttpServlet {
             request.setAttribute("activity", activity);
             request.setAttribute("min", min);
             request.setAttribute("max", max);
-            request.setAttribute("errorMessageMin", "Il numero minimo non può essere maggiore del numero massimo");
+            request.setAttribute("errorMessage", "Il numero minimo non può essere maggiore del numero massimo");
             String pathToResource = "WEB-INF/home.jsp";
             RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
             dispatcher.forward(request, response);

@@ -110,17 +110,6 @@
                         </div>
                     </div>
                 </div>
-                <c:if test="${not empty requestScope.errorMessageTitle}">
-                    <div class="text-center row lateral-margin">
-                        <div class="col-md-6">
-                            <div id="error-message-title" class="error-message">
-                                <p><c:out value="${requestScope.errorMessageTitle}" /></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                        </div>
-                    </div>
-                </c:if>
                 <div class="text-center row lateral-margin">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -137,15 +126,9 @@
                         </div>
                     </div>
                 </div>
-                <c:if test="${not empty requestScope.errorMessageMin}">
-                <div class="text-center row lateral-margin">
-                    <div class="col-md-6">
-                        <div id="error-message-max" class="error-message">
-                            <p><c:out value="${requestScope.errorMessageMin}" /></p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                    </div>
+                <c:if test="${not empty requestScope.errorMessage}">
+                <div id="error-message" class="text-center error-message">
+                    <p><c:out value="${requestScope.errorMessage}" /></p>
                 </div>
                 </c:if>
                 <div class="text-center top-margin">
