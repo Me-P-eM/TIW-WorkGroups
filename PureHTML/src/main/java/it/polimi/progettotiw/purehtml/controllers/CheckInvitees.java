@@ -99,8 +99,8 @@ public class CheckInvitees extends HttpServlet {
             }
         }
 
-
         Group group = (Group) session.getAttribute("group");
+
         // check if selected invitees respect the minimum participant number
         if (invitees.size()+1 < group.getMin()) {
             int attempts = (int) session.getAttribute("attempts");
@@ -155,6 +155,7 @@ public class CheckInvitees extends HttpServlet {
             }
             System.out.println("Group created");
             session.removeAttribute("group");
+            session.removeAttribute("attempts");
             String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
             response.sendRedirect(redirectionPath);
         }
