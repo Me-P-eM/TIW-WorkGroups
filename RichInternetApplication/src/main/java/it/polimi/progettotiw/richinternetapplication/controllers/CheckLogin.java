@@ -1,27 +1,30 @@
-package it.polimi.progettotiw.purehtml.controllers;
+package it.polimi.progettotiw.richinternetapplication.controllers;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import it.polimi.progettotiw.richinternetapplication.beans.User;
+import it.polimi.progettotiw.richinternetapplication.dao.UserDAO;
+import it.polimi.progettotiw.richinternetapplication.util.ParameterChecker;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-import it.polimi.progettotiw.purehtml.beans.User;
-import it.polimi.progettotiw.purehtml.dao.UserDAO;
-import it.polimi.progettotiw.purehtml.util.ParameterChecker;
+import com.google.gson.Gson;
 
 /**
  * Servlet implementation class CheckLogin
  */
 @WebServlet("/CheckLogin")
+@MultipartConfig
 public class CheckLogin extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
@@ -66,7 +69,8 @@ public class CheckLogin extends HttpServlet {
         // check parameters
         if (!ParameterChecker.checkString(request.getParameter("username"))
                 || !ParameterChecker.checkString(request.getParameter("password"))) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("Badly formatted request parameters");
             return;
         }
 
@@ -80,7 +84,8 @@ public class CheckLogin extends HttpServlet {
         try {
             u = userDao.checkCredentials(username, password);
         } catch (SQLException e) {
-            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Couldn't perform database interrogation");
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
             return;
         }
 
@@ -88,16 +93,17 @@ public class CheckLogin extends HttpServlet {
         if (u != null) {
             s.setAttribute("user", u);
             System.out.println("Setting http session ...");
-            String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
-            response.sendRedirect(redirectionPath);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            Gson g = new Gson();
+            response.getWriter().print(g.toJson(u));
 
         //if user is not authenticated
         } else {
             System.out.println("Login was not successful");
-            request.setAttribute("username", username);
-            request.setAttribute("password", password);
-            request.setAttribute("errorMessage", "Username o password errati");
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().print("Username o password errati");
         }
     }
 

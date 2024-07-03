@@ -6,6 +6,10 @@
 
     <display-name>PureHTML</display-name>
 
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
     <context-param>
         <param-name>dbUrl</param-name>
         <param-value>jdbc:mysql://localhost:3306/db_tiw?serverTimezone=UTC</param-value>
@@ -41,8 +45,4 @@
         <url-pattern>/GoToRegistry</url-pattern>
         <url-pattern>/CheckInvitees</url-pattern>
     </filter-mapping>
-
-    <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>
 </web-app>

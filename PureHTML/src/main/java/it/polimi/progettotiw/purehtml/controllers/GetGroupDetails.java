@@ -46,7 +46,6 @@ public class GetGroupDetails extends HttpServlet {
             String password = context.getInitParameter("dbPassword");
             Class.forName(driver);
             connection = DriverManager.getConnection(url, user, password);
-
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new UnavailableException("Couldn't load database driver");

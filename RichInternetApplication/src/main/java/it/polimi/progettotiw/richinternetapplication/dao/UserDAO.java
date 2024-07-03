@@ -1,0 +1,180 @@
+package it.polimi.progettotiw.richinternetapplication.dao;
+
+import it.polimi.progettotiw.richinternetapplication.beans.User;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserDAO {
+    private final Connection connection;
+
+    public UserDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    /**
+     * This method checks credentials from the database for login
+     * @param username the username inserted
+     * @param password the password inserted
+     * @return the user authenticated
+     * @throws SQLException
+     */
+    public User checkCredentials(String username, String password) throws SQLException {
+        String query =
+                "SELECT userID, name, surname, email " +
+                "FROM `user` " +
+                "WHERE userID=? AND password=?";
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setString(1, username);
+            p.setString(2, password);
+            try (ResultSet result = p.executeQuery()) {
+                User u = null;
+                if (result.isBeforeFirst()) {
+                    result.next();
+                    u = new User();
+                    u.setUsername(result.getString("userID"));
+                    u.setName(result.getString("name"));
+                    u.setSurname(result.getString("surname"));
+                    u.setEmail(result.getString("email"));
+                }
+                return u;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new SQLException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
+        }
+    }
+
+    /**
+     * This method checks if the username already exists in the database
+     * @param username the username inserted
+     * @return true if the username is already taken, false if the username is usable
+     * @throws SQLException
+     */
+    public boolean checkUsername(String username) throws SQLException {
+        String query =
+                "SELECT userID " +
+                "FROM `user` " +
+                "WHERE userID=?";
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setString(1, username);
+            try (ResultSet result = p.executeQuery()) {
+                if (!result.isBeforeFirst()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new SQLException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
+        }
+    }
+
+    /**
+     * This method checks if the email already exists in the database
+     * @param email the email inserted
+     * @return true if the email already exists, false if the email is usable
+     * @throws SQLException
+     */
+    public boolean checkEmail(String email) throws SQLException {
+        String query =
+                "SELECT email " +
+                "FROM `user` " +
+                "WHERE email=?";
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setString(1, email);
+            try (ResultSet result = p.executeQuery()) {
+                if (!result.isBeforeFirst()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new SQLException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
+        }
+    }
+
+    /**
+     * This method gets all users except one specific
+     * @return a list of users
+     * @throws SQLException
+     */
+    public List<User> getAllUsersExceptOne(String userID) throws SQLException {
+        String query =
+                "SELECT userID, name, surname " +
+                "FROM `user` " +
+                "WHERE userID<>? " +
+                "ORDER BY surname ASC";
+        List<User> users = new ArrayList<>();
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setString(1, userID);
+            try (ResultSet result = p.executeQuery()) {
+                while (result.next()) {
+                    User user = new User();
+                    user.setUsername(result.getString("userID"));
+                    user.setName(result.getString("name"));
+                    user.setSurname(result.getString("surname"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
+        }
+        return users;
+    }
+
+    /**
+     * This method registers a new user in the database
+     * @return the user registered
+     * @throws SQLException
+     */
+    public User registerUser(String username, String name, String surname, String email, String password) throws SQLException {
+        String query =
+                "INSERT INTO `user` (userID, name, surname, email, password) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement p = connection.prepareStatement(query);
+            p.setString(1, username);
+            p.setString(2, name);
+            p.setString(3, surname);
+            p.setString(4, email);
+            p.setString(5, password);
+            int rowsAffected = p.executeUpdate();
+            if (rowsAffected == 1) {
+                User u = new User();
+                u.setUsername(username);
+                u.setName(name);
+                u.setSurname(surname);
+                u.setEmail(email);
+                connection.commit();
+                return u;
+            } else {
+                throw new SQLException("Failed to register user: no rows affected");
+            }
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+}
