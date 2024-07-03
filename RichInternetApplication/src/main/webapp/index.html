@@ -6,32 +6,106 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/global.css" />
         <script src="utils.js" defer></script>
-        <script src="loginOperations.js" defer></script>
+        <script src="loginRegisterOperations.js" defer></script>
     </head>
     <body class="body-login">
         <div class="container">
             <div class="text-center">
                 <h1 class="title">GRUPPI DI LAVORO</h1>
-                <h2 class="bottom-margin">Per accedere inserisci le tue credenziali</h2>
-                <form action="#">
+                <h2 id="form-title" class="bottom-margin">Per accedere inserisci le tue credenziali</h2>
+                <form id="login-form" action="#">
                     <div class="form-group bottom-margin">
                         <label for="username">Inserisci il tuo username</label>
-                        <input id="username" type="text" name="username" placeholder="Username" required>
+                        <input id="username" name="username" type="text" placeholder="Username" required>
                     </div>
                     <div class="form-group bottom-margin">
                         <label for="password">Inserisci la tua password</label>
-                        <input id="password" type="password" placeholder="Password" name="password" required>
+                        <input id="password" name="password" type="password" placeholder="Password" required>
                     </div>
-                    <div id="loader" class="loader" style="display: none;"></div>
                     <div id="error-message" class="error-message bottom-margin"></div>
+                    <div id="loader" class="loader" style="display: none;"></div>
                     <div class="bottom-margin">
                         <button id="login-button" class="btn btn-outline-primary">ACCEDI</button>
                     </div>
                     <div class="member-name-link">
                         <p>
                             Se non hai ancora un account, puoi registrarti
-                            <a href="">qui</a>
+                            <a id="show-registration" href="">qui</a>
                         </p>
+                    </div>
+                </form>
+                <form id="registration-form" action="#" style="display: none;">
+                    <div class="row bottom-margin lateral-margin">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="name">Inserisci il tuo nome</label>
+                                <br>
+                                <input id="name" name="name" type="text" placeholder="Nome" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="surname">Inserisci il tuo cognome</label>
+                                <br>
+                                <input id="surname" name="surname" type="text" placeholder="Cognome" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row lateral-margin">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="reg-username">Inserisci il tuo username</label>
+                                <br>
+                                <input id="reg-username" name="reg-username" type="text" placeholder="Username" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">Inserisci la tua email</label>
+                                <br>
+                                <input id="email" name="email" type="text" placeholder="Email" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row lateral-margin">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div id="error-message-email" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="row top-margin lateral-margin">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="reg-password">Inserisci la tua password</label>
+                                <br>
+                                <input id="reg-password" name="reg-password" type="password" placeholder="Password" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="passwordCheck">Ripeti la tua password</label>
+                                <br>
+                                <input id="passwordCheck" name="passwordCheck" type="password" placeholder="Ripeti password" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row lateral-margin">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div id="error-message-password" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div id="reg-error-message" class="error-message top-margin bottom-margin"></div>
+                    <div id="reg-loader" class="loader" style="display: none;"></div>
+                    <div class="row top-margin lateral-margin2">
+                        <div class="col-md-6">
+                            <a id="show-login" class="btn btn-outline-danger">INDIETRO</a>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="register-button" class="btn btn-outline-primary">REGISTRATI</button>
+                        </div>
                     </div>
                 </form>
             </div>
