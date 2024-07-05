@@ -99,7 +99,7 @@ public class CheckLogin extends HttpServlet {
             Gson g = new Gson();
             response.getWriter().print(g.toJson(u));
 
-        //if user is not authenticated
+        // if user is not authenticated
         } else {
             System.out.println("Login was not successful");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

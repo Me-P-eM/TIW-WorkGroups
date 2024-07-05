@@ -2,40 +2,59 @@
  * JavaScript file handling the login and registration operations
  */
 (function() {
+    const errorMessage = document.getElementById("error-message");
+    const errorMessageEmail = document.getElementById("error-message-email");
+    const errorMessagePassword = document.getElementById("error-message-password");
+    const regErrorMessage = document.getElementById("reg-error-message");
+    const loader = document.getElementById("loader");
+    const regLoader = document.getElementById("reg-loader");
+    const formTitle = document.getElementById("form-title");
+    const loginForm = document.getElementById("login-form");
+    const registrationForm = document.getElementById("registration-form");
+    const showLogin = document.getElementById("show-login");
+    const showRegistration = document.getElementById("show-registration");
+    const loginButton = document.getElementById("login-button");
+    const registerButton = document.getElementById("register-button");
+
+    clearErrorMessages();
+    hideElement(loader);
+    hideElement(regLoader);
+
     function clearErrorMessages() {
-        setErrorMessage("error-message", "");
-        setErrorMessage("error-message-email", "");
-        setErrorMessage("error-message-password", "");
-        setErrorMessage("reg-error-message", "");
+        clearMessage(errorMessage);
+        clearMessage(errorMessageEmail);
+        clearMessage(errorMessagePassword);
+        clearMessage(regErrorMessage);
     }
 
     // show registration
-    document.getElementById("show-registration").addEventListener("click", (e) => {
+    showRegistration.addEventListener("click", (e) => {
         e.preventDefault();
-        document.getElementById("form-title").textContent = "Per registrarti, compila i seguenti campi";
-        hideElement("login-form");
-        showElement("registration-form");
+        setMessage(formTitle, "Per registrarti, compila i seguenti campi");
+        hideElement(loginForm);
+        showElement(registrationForm);
         clearErrorMessages();
-        resetForm("login-form");
-        resetForm("registration-form");
+        resetForm(loginForm);
+        resetForm(registrationForm);
     });
 
     // show login
-    document.getElementById("show-login").addEventListener("click", (e) => {
+    showLogin.addEventListener("click", (e) => {
         e.preventDefault();
-        document.getElementById("form-title").textContent = "Per accedere inserisci le tue credenziali";
-        hideElement("registration-form");
-        showElement("login-form");
+        setMessage(formTitle, "Per accedere inserisci le tue credenziali");
+        hideElement(registrationForm);
+        showElement(loginForm);
         clearErrorMessages();
-        resetForm("login-form");
-        resetForm("registration-form");
+        resetForm(loginForm);
+        resetForm(registrationForm);
     });
 
     // handle login
-    document.getElementById("login-button").addEventListener("click", (e) => {
+    loginButton.addEventListener("click", (e) => {
         e.preventDefault();
         clearErrorMessages();
-        showElement("loader");
+        hideElement(loginButton);
+        showElement(loader);
         const relatedForm = e.target.closest("form");
         if (relatedForm.checkValidity()) {
             makeCall("POST", "/RichInternetApplication_war/CheckLogin", relatedForm, (x) => {
@@ -48,32 +67,40 @@
                             sessionStorage.setItem("userSurname", responseJson["surname"]);
                             sessionStorage.setItem("userUsername", responseJson["username"]);
                             sessionStorage.setItem("userEmail", responseJson["email"]);
+                            hideElement(loader);
+                            resetForm(loginForm);
+                            showElement(loginButton);
                             window.location.href = "workGroups.html";
                             break;
                         case 400:
                         case 401:
                         case 502:
-                            setErrorMessage("error-message", response);
-                            hideElement("loader");
+                            setMessage(errorMessage, response);
+                            hideElement(loader);
+                            showElement(loginButton);
                             break;
                         default:
-                            setErrorMessage("error-message", "Problems during login");
-                            hideElement("loader");
+                            setMessage(errorMessage, "Something went wrong");
+                            hideElement(loader);
+                            showElement(loginButton);
                     }
                 }
             }, false);
         } else {
             relatedForm.reportValidity();
-            setErrorMessage("error-message", "Tutti i campi devono essere compilati correttamente");
-            hideElement("loader");
+            setMessage(errorMessage, "Tutti i campi devono essere compilati correttamente");
+            hideElement(loader);
+            showElement(loginButton);
         }
     });
 
     // handle registration
-    document.getElementById("register-button").addEventListener("click", (e) => {
+    registerButton.addEventListener("click", (e) => {
         e.preventDefault();
         clearErrorMessages();
-        showElement("reg-loader");
+        hideElement(registerButton);
+        hideElement(showLogin);
+        showElement(regLoader);
         const relatedForm = e.target.closest("form");
         if (relatedForm.checkValidity()) {
             const email = relatedForm.querySelector("#email").value;
@@ -82,16 +109,18 @@
             let isValid = true;
             // check email syntactic validity and password equality
             if (!isValidEmail(email)) {
-                setErrorMessage("error-message-email", "Email non valida")
+                setMessage(errorMessageEmail, "Email non valida");
                 isValid = false;
             }
             if (password !== passwordCheck) {
-                setErrorMessage("error-message-password", "La password non corrisponde")
+                setMessage(errorMessagePassword, "La password non corrisponde");
                 isValid = false;
             }
             if (!isValid) {
-                hideElement("reg-loader")
-                return
+                hideElement(regLoader);
+                showElement(showLogin);
+                showElement(registerButton);
+                return;
             }
             makeCall("POST", "/RichInternetApplication_war/CheckRegistration", relatedForm, (x) => {
                 if (x.readyState === XMLHttpRequest.DONE) {
@@ -103,25 +132,34 @@
                             sessionStorage.setItem("userSurname", responseJson["surname"]);
                             sessionStorage.setItem("userUsername", responseJson["username"]);
                             sessionStorage.setItem("userEmail", responseJson["email"]);
+                            hideElement(regLoader);
+                            resetForm(registrationForm);
+                            showElement(showLogin);
+                            showElement(registerButton);
                             window.location.href = "workGroups.html";
                             break;
                         case 400:
                         case 409:
                         case 502:
-                            setErrorMessage("reg-error-message", response);
-                            hideElement("reg-loader");
+                            setMessage(regErrorMessage, response);
+                            hideElement(regLoader);
+                            showElement(showLogin);
+                            showElement(registerButton);
                             break;
                         default:
-                            setErrorMessage("reg-error-message", "Problems during registration");
-                            hideElement("reg-loader");
+                            setMessage(regErrorMessage, "Something went wrong");
+                            hideElement(regLoader);
+                            showElement(showLogin);
+                            showElement(registerButton);
                     }
                 }
             }, false);
         } else {
             relatedForm.reportValidity();
-            setErrorMessage("reg-error-message", "Tutti i campi devono essere compilati correttamente");
-            hideElement("reg-loader");
+            setMessage(regErrorMessage, "Tutti i campi devono essere compilati correttamente");
+            hideElement(regLoader);
+            showElement(showLogin);
+            showElement(registerButton);
         }
     });
-
 })();

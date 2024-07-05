@@ -19,20 +19,24 @@ function makeCall(method, url, formElement, cback, reset = true) {
     }
 }
 
-function showElement(elementId) {
-    document.getElementById(elementId).style.display = "block";
+function showElement(element) {
+    element.removeAttribute("style");
 }
 
-function hideElement(elementId) {
-    document.getElementById(elementId).style.display = "none";
+function hideElement(element) {
+    element.style.display = "none";
 }
 
-function setErrorMessage(elementId, message) {
-    document.getElementById(elementId).textContent = message;
+function setMessage(element, message) {
+    element.textContent = message;
 }
 
-function resetForm(formId) {
-    document.getElementById(formId).reset();
+function clearMessage(element) {
+    setMessage(element, "");
+}
+
+function resetForm(form) {
+    form.reset();
 }
 
 function isValidEmail(email) {

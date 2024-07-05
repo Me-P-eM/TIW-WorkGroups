@@ -93,13 +93,13 @@ public class CheckGroupParameters extends HttpServlet {
             return;
         }
         if (activity < 1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The activity must be 1 day at least");
             return;
         } else if (min < 1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The minimum must be 1 at least");
             return;
         } else if (max < 1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The maximum must be 1 at least");
             return;
         }
 

@@ -18,6 +18,123 @@
             <div>
                 <a id="logout-button" class="btn btn-outline-danger">LOGOUT</a>
             </div>
+            <h1 id="title" class="text-center title"></h1>
+            <div id="home" class="text-center" style="display:none">
+                <h2 id="subtitle"></h2>
+                <p id="details1"></p>
+                <div id="createdGroupsContainer" class="container-fluid">
+                    <div class="row justify-content-md-center">
+                        <div class="col col-lg">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-head">
+                                <tr>
+                                    <th>Titolo</th>
+                                </tr>
+                                </thead>
+                                <tbody id="createdGroups">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <p id="details2"></p>
+                <div id="invitedGroupsContainer" class="container-fluid">
+                    <div class="row justify-content-md-center">
+                        <div class="col col-lg">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-head">
+                                <tr>
+                                    <th>Titolo</th>
+                                </tr>
+                                </thead>
+                                <tbody id="invitedGroups">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-decoration-underline top-margin">Per creare un gruppo, compila i seguenti campi:</p>
+                <form id="groupCreation" action="#">
+                    <div class="text-center row bottom-margin lateral-margin">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="groupTitle">Inserisci il titolo del gruppo</label>
+                                <br>
+                                <input id="groupTitle" name="groupTitle" type="text" placeholder="Titolo" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="activity">Inserisci la durata di attività del gruppo (in giorni)</label>
+                                <br>
+                                <input id="activity" name="activity" type="number" placeholder="Attività" min="1" step="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center row lateral-margin">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="min">Inserisci il numero minimo di partecipanti</label>
+                                <br>
+                                <input id="min" name="min" type="number" placeholder="Minimo"  min="1" step="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="max">Inserisci il numero massimo di partecipanti</label>
+                                <br>
+                                <input id="max" name="max" type="number" placeholder="Massimo"  min="1" step="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="home-error-message" class="text-center error-message top-margin"></div>
+                    <div id="loader" class="loader" style="display: none;"></div>
+                    <div class="text-center top-margin">
+                        <button id="create" class="btn btn-outline-primary">INVIA</button>
+                    </div>
+                </form>
+            </div>
+            <div id="groupDetails" class="text-center" style="display:none">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-head">
+                    <tr>
+                        <th>Titolo</th>
+                        <th>Creatore</th>
+                        <th>Data di creazione</th>
+                        <th>Giorni di attività</th>
+                        <th>Minimo di partecipanti</th>
+                        <th>Massimo di partecipanti</th>
+                    </tr>
+                    </thead>
+                    <tbody id="group">
+                    </tbody>
+                </table>
+                <h2>Partecipanti</h2>
+                <div class="container-fluid d-flex justify-content-center align-items-center">
+                    <div class="w-100">
+                        <table class="table table-bordered table-hover text-center">
+                            <thead class="table-head">
+                            <tr>
+                                <th class="w-50">Cognome</th>
+                                <th class="w-50">Nome</th>
+                            </tr>
+                            </thead>
+                            <tbody id="participants">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <button id="show-home" class="btn btn-outline-primary">INDIETRO</button>
+                </div>
+            </div>
+            <div id="registry" class="text-center" style="display:none">
+                //----
+            </div>
+            <div id="cancellation" class="text-center" style="display:none">
+                //----
+            </div>
+            <div id="alertLabel" class="alert alert-warning text-center" style="display:none" role="alert"></div>
         </div>
     </body>
 </html>
