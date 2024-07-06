@@ -141,4 +141,14 @@ public class CheckGroupParameters extends HttpServlet {
         result.add("group", groupJson);
         response.getWriter().print(result);
     }
+
+    public void destroy() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.out.println("Couldn't close database connection after use");
+            }
+        }
+    }
 }

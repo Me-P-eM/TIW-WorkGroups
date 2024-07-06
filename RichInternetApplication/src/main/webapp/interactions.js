@@ -62,6 +62,11 @@
         this.create = _create;
         this.pageOrchestrator = _pageOrchestrator;
 
+        this.create.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.sendGroupParameters(e, this.create, this.groupCreation);
+        });
+
         this.show = () => {
             makeCall("GET", "/RichInternetApplication_war/GoToHome", null,
                 (x) => {
@@ -88,9 +93,6 @@
                                 this.updateGroups(this.invitedGroups, invitedGroups);
                                 showElement(this.invitedGroupsContainer);
                             }
-                            this.create.addEventListener("click", (e) => {
-                                this.sendGroupParameters(e, this.create, this.groupCreation);
-                            });
                             showElement(this.outSideContainer);
                             break;
                         case 400:
@@ -100,6 +102,7 @@
                             break;
                         case 401:
                         case 403:
+                            this.hide();
                             this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                             break;
                         default:
@@ -140,11 +143,6 @@
             setMessage(element, message);
         };
 
-        this.hide = function() {
-            clearMessage(this.title)
-            hideElement(this.outSideContainer);
-        }
-
         this.sendGroupParameters = function (e, button, form) {
             e.preventDefault();
             clearMessage(this.homeErrorMessage);
@@ -176,9 +174,16 @@
                                 this.pageOrchestrator.transitionToRegistry();
                                 break;
                             case 400:
+                            case 500:
+                            case 502:
                                 setMessage(this.homeErrorMessage, response);
                                 hideElement(this.loader);
                                 showElement(button);
+                                break;
+                            case 401:
+                            case 403:
+                                this.hide();
+                                this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                                 break;
                             default:
                                 setMessage(this.homeErrorMessage, "Something went wrong");
@@ -194,17 +199,49 @@
                 showElement(button);
             }
         }
+
+        this.hide = function() {
+            clearMessage(this.title);
+            clearMessage(this.subtitle);
+            clearMessage(this.details1);
+            this.createdGroups.innerHTML = "";
+            clearMessage(this.details2);
+            this.invitedGroups.innerHTML = "";
+            clearMessage(this.homeErrorMessage);
+            hideElement(this.outSideContainer);
+        }
     }
 
     // building the view related to group details
-    function GroupDetails(_alertBox, _title, _outSideContainer, _group, _participants, _showHome, _pageOrchestrator) {
+    function GroupDetails(_alertBox, _title, _outSideContainer, _group, _details, _participants, _showHome, _trashBin, _pageOrchestrator) {
         this.alertBox = _alertBox;
         this.title = _title;
         this.outSideContainer = _outSideContainer;
         this.group = _group;
+        this.details = _details;
         this.participants = _participants;
         this.showHome = _showHome;
+        this.trashBin = _trashBin
         this.pageOrchestrator = _pageOrchestrator;
+        let resultGroup, resultInvitees;
+
+        this.trashBin.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+        this.trashBin.addEventListener("drop", (e) => {
+            e.preventDefault();
+            if (resultInvitees.length >= resultGroup["min"]) {
+                const participantID = e.dataTransfer.getData("text/plain");
+                this.removeParticipant(resultGroup["groupID"], participantID);
+            } else {
+                this.alertBox.show("Non puoi effettuare quest'operazione perché il numero " +
+                    "minimo di partecipanti dev'essere rispettato");
+            }
+        });
+        this.showHome.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.pageOrchestrator.transitionToHome();
+        });
 
         this.show = (groupID) => {
             makeCall("GET", "/RichInternetApplication_war/GetGroupDetails?groupID=" + groupID, null,
@@ -213,13 +250,18 @@
                         case 200:
                             const responseAsJson = JSON.parse(x.responseText);
                             const group = responseAsJson["group"];
+                            resultGroup = group;
                             const creator = responseAsJson["creator"];
                             const invitees = responseAsJson["invitees"];
-                            this.updateView(this.title, group, creator, this.group, invitees, this.participants)
-                            this.showHome.addEventListener("click", (e) => {
-                                e.preventDefault();
-                                this.pageOrchestrator.transitionToHome();
-                            });
+                            resultInvitees = invitees;
+                            this.updateView(group, creator, invitees)
+                            if (sessionStorage.getItem("userUsername") === creator["username"]) {
+                                showElement(this.details);
+                                showElement(this.trashBin);
+                            } else {
+                                hideElement(this.trashBin);
+                                hideElement(this.details);
+                            }
                             showElement(this.outSideContainer);
                             break;
                         case 400:
@@ -229,6 +271,7 @@
                             break;
                         case 401:
                         case 403:
+                            this.hide();
                             this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                             break;
                         default:
@@ -237,9 +280,9 @@
                 });
         }
 
-        this.updateView = function(title, group, creator, groupContainer, invitees, participantsContainer) {
-            setMessage(title, "Dettagli del gruppo: " + group["title"]);
-            groupContainer.innerHTML = "";
+        this.updateView = function(group, creator, invitees) {
+            setMessage(this.title, "Dettagli del gruppo: " + group["title"]);
+            this.group.innerHTML = "";
             let row = document.createElement("tr");
             const groupDetails = [
                 group["title"],
@@ -254,31 +297,60 @@
                 cell.appendChild(document.createTextNode(detail));
                 row.appendChild(cell);
             });
-            groupContainer.appendChild(row);
-            participantsContainer.innerHTML = "";
-            row = document.createElement("tr");
-            row = document.createElement("tr");
-            let surnameCell = document.createElement("td");
-            surnameCell.appendChild(document.createTextNode(creator["surname"]));
-            row.appendChild(surnameCell);
-            let nameCell = document.createElement("td");
-            nameCell.appendChild(document.createTextNode(creator["name"]));
-            row.appendChild(nameCell);
-            participantsContainer.appendChild(row);
-            invitees.forEach(participant => {
+            this.group.appendChild(row);
+            this.participants.innerHTML = "";
+            const addParticipantRow = (participant) => {
                 let row = document.createElement("tr");
+                if (sessionStorage.getItem("userUsername") === creator["username"] && participant["username"] !== creator["username"]) {
+                    row.draggable = true;
+                    row.dataset.participantID = participant["username"];
+                    row.addEventListener("dragstart", (e) => {
+                        e.dataTransfer.setData("text/plain", e.target.dataset.participantID);
+                    });
+                }
                 let surnameCell = document.createElement("td");
                 surnameCell.appendChild(document.createTextNode(participant["surname"]));
                 row.appendChild(surnameCell);
                 let nameCell = document.createElement("td");
                 nameCell.appendChild(document.createTextNode(participant["name"]));
                 row.appendChild(nameCell);
-                participantsContainer.appendChild(row);
-            });
+                this.participants.appendChild(row);
+            };
+            addParticipantRow(creator);
+            invitees.forEach(addParticipantRow);
         }
+
+        this.removeParticipant = (groupID, participantID) => {
+            makeCall("POST", "/RichInternetApplication_war/RemoveParticipant?groupID=" + groupID + "&username=" + participantID,
+                null,
+                (x) => {
+                    switch (x.status) {
+                        case 200:
+                            clearMessage(this.title);
+                            hideElement(this.outSideContainer);
+                            this.show(groupID);
+                            this.alertBox.show("Partecipante rimosso con successo");
+                            break;
+                        case 400:
+                        case 403:
+                        case 500:
+                        case 502:
+                            this.alertBox.show(x.responseText);
+                            break;
+                        case 401:
+                            this.hide();
+                            this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                            break;
+                        default:
+                            this.alertBox.show("Something went wrong");
+                    }
+                });
+        };
 
         this.hide = function() {
             clearMessage(this.title)
+            this.group.innerHTML = "";
+            this.participants.innerHTML = "";
             hideElement(this.outSideContainer);
         }
     }
@@ -330,9 +402,11 @@
         // accessing elements related to groupDetails
         const detailsOutSideCourseContainer = document.getElementById("groupDetails");
         const group = document.getElementById("group");
+        const details = document.getElementById("details");
         const participants = document.getElementById("participants");
         const showHome = document.getElementById("show-home");
-        this.groupDetails = new GroupDetails(this.alertBox, title, detailsOutSideCourseContainer, group, participants, showHome, this);
+        const trashBin = document.getElementById("trash-bin");
+        this.groupDetails = new GroupDetails(this.alertBox, title, detailsOutSideCourseContainer, group, details, participants, showHome, trashBin, this);
 
         // accessing elements related to registry
 

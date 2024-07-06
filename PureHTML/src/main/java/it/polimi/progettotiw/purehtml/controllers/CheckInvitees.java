@@ -159,4 +159,14 @@ public class CheckInvitees extends HttpServlet {
             response.sendRedirect(redirectionPath);
         }
     }
+
+    public void destroy() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.out.println("Couldn't close database connection after use");
+            }
+        }
+    }
 }

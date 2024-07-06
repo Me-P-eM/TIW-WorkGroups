@@ -153,4 +153,14 @@ public class CheckGroupParameters extends HttpServlet {
             dispatcher.forward(request, response);
         }
     }
+
+    public void destroy() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.out.println("Couldn't close database connection after use");
+            }
+        }
+    }
 }

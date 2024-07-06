@@ -54,7 +54,7 @@ public class GroupDAO {
         String query =
                 "SELECT groupID, title " +
                 "FROM invitation NATURAL JOIN `group` " +
-                "WHERE userID=? AND CURDATE() < DATE_ADD(creation, INTERVAL activity DAY)" +
+                "WHERE userID=? AND CURDATE() < DATE_ADD(creation, INTERVAL activity DAY) " +
                 "ORDER BY title ASC";
         List<Group> groups = new ArrayList<>();
         try (PreparedStatement p = connection.prepareStatement(query)) {
@@ -92,6 +92,7 @@ public class GroupDAO {
                 if (result.isBeforeFirst()) {
                     result.next();
                     group = new Group();
+                    group.setGroupID(groupID);
                     group.setCreator(result.getString("creator"));
                     group.setTitle(result.getString("title"));
                     group.setCreation(result.getDate("creation").toLocalDate());
@@ -115,7 +116,7 @@ public class GroupDAO {
      */
     public User getCreatorByGroupID(int groupID) throws SQLException {
         String query =
-                "SELECT name, surname " +
+                "SELECT userID, name, surname " +
                 "FROM `group` JOIN `user` ON creator=userID " +
                 "WHERE groupID=?";
         try (PreparedStatement p = connection.prepareStatement(query)) {
@@ -125,6 +126,7 @@ public class GroupDAO {
                 if (result.isBeforeFirst()) {
                     result.next();
                     creator = new User();
+                    creator.setUsername(result.getString("userID"));
                     creator.setName(result.getString("name"));
                     creator.setSurname(result.getString("surname"));
                 }
@@ -144,7 +146,7 @@ public class GroupDAO {
      */
     public List<User> getInviteesByGroupID(int groupID) throws SQLException {
         String query =
-                "SELECT name, surname " +
+                "SELECT userID, name, surname " +
                 "FROM invitation NATURAL JOIN `user` " +
                 "WHERE groupID=? " +
                 "ORDER BY surname ASC";
@@ -154,6 +156,7 @@ public class GroupDAO {
             try (ResultSet result = p.executeQuery()) {
                 while (result.next()) {
                     User invitee = new User();
+                    invitee.setUsername(result.getString("userID"));
                     invitee.setName(result.getString("name"));
                     invitee.setSurname(result.getString("surname"));
                     invitees.add(invitee);
@@ -199,11 +202,40 @@ public class GroupDAO {
     }
 
     /**
-     * This method stores the group in the database and sets invitees to that group
-     * @param group the group
-     * @param invitees people invited to the group
+     * This method returns the number of participants in a specific group
+     * @param groupID the id of the group
+     * @return the number of participants
      * @throws SQLException
      */
+    public int countParticipants(int groupID) throws SQLException {
+        int count = 0;
+        String query =
+                "SELECT COUNT(*)+1 " +
+                "FROM invitation " +
+                "WHERE groupID=?";
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setInt(1, groupID);
+            try (ResultSet result = p.executeQuery()) {
+                if (result.next()) {
+                    count = result.getInt(1);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new SQLException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
+        }
+        return count;
+    }
+
+        /**
+         * This method stores the group in the database and sets invitees to that group
+         * @param group the group
+         * @param invitees people invited to the group
+         * @throws SQLException
+         */
     public void createGroupAndSetInvitation(Group group, List<String> invitees) throws SQLException {
         String query =
                 "INSERT INTO `group` (creator, title, creation, activity, min, max) " +
@@ -233,7 +265,7 @@ public class GroupDAO {
         } catch (SQLException e) {
             connection.rollback();
             e.printStackTrace();
-            throw e;
+            throw new SQLException(e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -247,19 +279,65 @@ public class GroupDAO {
      */
     public void setInvitees(List<String> invitees, int groupID) throws SQLException {
         String query =
-                "INSERT INTO invitation (userID, groupID)" +
+                "INSERT INTO invitation (userID, groupID) " +
                 "VALUES (?, ?)";
-        try (PreparedStatement p = connection.prepareStatement(query)) {
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement p = connection.prepareStatement(query);
             for (String invitee : invitees) {
                 p.setString(1, invitee);
                 p.setInt(2, groupID);
                 p.addBatch();
             }
-            p.executeBatch();
+            int[] rowsAffected = p.executeBatch();
+            boolean allSuccessful = true;
+            for (int rows : rowsAffected) {
+                if (rows != 1) {
+                    allSuccessful = false;
+                    break;
+                }
+            }
+            if (allSuccessful) {
+                connection.commit();
+            } else {
+                throw new SQLException("Failed to set invitees: not all rows affected");
+            }
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
-            throw e;
+            throw new SQLException(e);
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 
+    /**
+     * This method removes a participant from a specific group
+     * @param groupID the id of the group
+     * @param username the username of the participant to be removed
+     * @throws SQLException
+     */
+    public void removeParticipant(String username, int groupID) throws SQLException {
+        String query =
+                "DELETE FROM invitation " +
+                "WHERE userID=? AND groupID=?";
+        try {
+        connection.setAutoCommit(false);
+        PreparedStatement p = connection.prepareStatement(query);
+            p.setString(1, username);
+            p.setInt(2, groupID);
+            int rowsAffected = p.executeUpdate();
+            if (rowsAffected == 1) {
+                connection.commit();
+            } else {
+                throw new SQLException("Failed to remove: no rows affected");
+            }
+        } catch (SQLException e) {
+            connection.rollback();
+            e.printStackTrace();
+            throw new SQLException(e);
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
 }

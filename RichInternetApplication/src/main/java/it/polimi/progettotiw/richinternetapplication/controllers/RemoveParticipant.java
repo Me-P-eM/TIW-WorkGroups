@@ -1,13 +1,8 @@
 package it.polimi.progettotiw.richinternetapplication.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import it.polimi.progettotiw.richinternetapplication.beans.Group;
 import it.polimi.progettotiw.richinternetapplication.beans.User;
 import it.polimi.progettotiw.richinternetapplication.dao.GroupDAO;
-import it.polimi.progettotiw.richinternetapplication.util.LocalDateAdapter;
 import it.polimi.progettotiw.richinternetapplication.util.ParameterChecker;
 
 import javax.servlet.ServletContext;
@@ -22,21 +17,19 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.List;
 
 /**
- * Servlet implementation class GetGroupDetails
+ * Servlet implementation class RemoveParticipant
  */
-@WebServlet("/GetGroupDetails")
-public class GetGroupDetails extends HttpServlet {
+@WebServlet("/RemoveParticipant")
+public class RemoveParticipant extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetGroupDetails() {
+    public RemoveParticipant() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -63,9 +56,17 @@ public class GetGroupDetails extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
+
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int groupID;
         // check parameters
-        if (!ParameterChecker.checkString(request.getParameter("groupID"))) {
+        if (!ParameterChecker.checkString(request.getParameter("groupID"))
+                || !ParameterChecker.checkString(request.getParameter("username"))) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().print("Badly formatted request parameters");
             return;
@@ -85,79 +86,61 @@ public class GetGroupDetails extends HttpServlet {
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        boolean isParticipant;
+        String participant = request.getParameter("username");
         User creator;
-        Group group;
-        List<User> invitees;
         GroupDAO groupDAO = new GroupDAO(connection);
 
-        // check if the user of the session is a participant of the selected group
+        // check that the requester is the creator of the group
         try {
-            isParticipant = groupDAO.checkParticipant(groupID, user.getUsername());
+            creator = groupDAO.getCreatorByGroupID(groupID);
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
             response.getWriter().print("Could not access the database");
             return;
         }
-
-        // if he's a participant, he can access group details
-        if (isParticipant) {
-            // get group information
-            try {
-                group = groupDAO.getGroupByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
-                return;
-            }
-
-            // get creator's username, name and surname
-            try {
-                creator = groupDAO.getCreatorByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
-                return;
-            }
-
-            // get invitees
-            try {
-                invitees = groupDAO.getInviteesByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
-                return;
-            }
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).setPrettyPrinting().create();
-            JsonObject jsonResponse = new JsonObject();
-            jsonResponse.add("group", gson.toJsonTree(group));
-            jsonResponse.add("creator", gson.toJsonTree(creator));
-            JsonArray inviteesArray = gson.toJsonTree(invitees).getAsJsonArray();
-            jsonResponse.add("invitees", inviteesArray);
-            response.getWriter().print(gson.toJson(jsonResponse));
-
-
-        // if he's not a participant, he can't access group details
-        } else {
+        if (!creator.getUsername().equals(user.getUsername())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("You do not have access to details of this group, or this group does not exists");
+            response.getWriter().print("You must be the creator of the group in order to remove a participant");
+            return;
         }
-    }
 
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        doGet(request, response);
+        // check if the minimum number of participants is respected
+        int currentParticipants;
+        try {
+            currentParticipants = groupDAO.countParticipants(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+        Group group;
+        try {
+            group = groupDAO.getGroupByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+        if (currentParticipants <= group.getMin()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("Non puoi effettuare quest'operazione perché il numero minimo di partecipanti dev'essere rispettato");
+            return;
+        }
+
+        // remove the participant from the group
+        try {
+            groupDAO.removeParticipant(participant, groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().println("Partecipante rimosso con successo");
     }
 
     public void destroy() {

@@ -55,7 +55,7 @@ public class GroupDAO {
         String query =
                 "SELECT groupID, title " +
                 "FROM invitation NATURAL JOIN `group` " +
-                "WHERE userID=? AND CURDATE() < DATE_ADD(creation, INTERVAL activity DAY)" +
+                "WHERE userID=? AND CURDATE() < DATE_ADD(creation, INTERVAL activity DAY) " +
                 "ORDER BY title ASC";
         List<Group> groups = new ArrayList<>();
         try (PreparedStatement p = connection.prepareStatement(query)) {
@@ -93,6 +93,7 @@ public class GroupDAO {
                 if (result.isBeforeFirst()) {
                     result.next();
                     group = new Group();
+                    group.setGroupID(groupID);
                     group.setCreator(result.getString("creator"));
                     group.setTitle(result.getString("title"));
                     group.setCreation(result.getDate("creation").toLocalDate());
@@ -234,7 +235,7 @@ public class GroupDAO {
         } catch (SQLException e) {
             connection.rollback();
             e.printStackTrace();
-            throw e;
+            throw new SQLException(e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -248,18 +249,35 @@ public class GroupDAO {
      */
     public void setInvitees(List<String> invitees, int groupID) throws SQLException {
         String query =
-                "INSERT INTO invitation (userID, groupID)" +
+                "INSERT INTO invitation (userID, groupID) " +
                 "VALUES (?, ?)";
-        try (PreparedStatement p = connection.prepareStatement(query)) {
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement p = connection.prepareStatement(query);
             for (String invitee : invitees) {
                 p.setString(1, invitee);
                 p.setInt(2, groupID);
                 p.addBatch();
             }
-            p.executeBatch();
+            int[] rowsAffected = p.executeBatch();
+            boolean allSuccessful = true;
+            for (int rows : rowsAffected) {
+                if (rows != 1) {
+                    allSuccessful = false;
+                    break;
+                }
+            }
+            if (allSuccessful) {
+                connection.commit();
+            } else {
+                throw new SQLException("Failed to set invitees: not all rows affected");
+            }
         } catch (SQLException e) {
+            connection.rollback();
             e.printStackTrace();
-            throw e;
+            throw new SQLException(e);
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 

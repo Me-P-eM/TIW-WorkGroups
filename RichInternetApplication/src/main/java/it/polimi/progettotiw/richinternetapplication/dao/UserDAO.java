@@ -172,7 +172,7 @@ public class UserDAO {
         } catch (SQLException e) {
             connection.rollback();
             e.printStackTrace();
-            throw e;
+            throw new SQLException(e);
         } finally {
             connection.setAutoCommit(true);
         }

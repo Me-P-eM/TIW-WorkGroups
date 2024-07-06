@@ -98,4 +98,14 @@ public class GoToRegistry extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
     }
+
+    public void destroy() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.out.println("Couldn't close database connection after use");
+            }
+        }
+    }
 }
