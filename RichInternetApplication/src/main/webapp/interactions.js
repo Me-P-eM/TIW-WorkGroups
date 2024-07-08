@@ -39,12 +39,12 @@
     }
 
     // building the view related to homepage
-    function HomePage(_alertBox, _title, _container, _subtitle, _details1, _createdGroupsContainer, _createdGroups,
+    function HomePage(_alertBox, _title, _outsideContainer, _subtitle, _details1, _createdGroupsContainer, _createdGroups,
                       _details2, _invitedGroupsContainer, _invitedGroups, _groupCreation, _groupTitle, _activity, _min, _max,
                       _homeErrorMessage, _loader, _create, _pageOrchestrator) {
         this.alertBox = _alertBox;
         this.title = _title;
-        this.outSideContainer = _container;
+        this.outsideContainer = _container;
         this.subtitle = _subtitle;
         this.details1 = _details1;
         this.createdGroupsContainer = _createdGroupsContainer;
@@ -64,7 +64,7 @@
 
         this.create.addEventListener("click", (e) => {
             e.preventDefault();
-            this.sendGroupParameters(e, this.create, this.groupCreation);
+            this.sendGroupParameters(e);
         });
 
         this.show = () => {
@@ -93,7 +93,7 @@
                                 this.updateGroups(this.invitedGroups, invitedGroups);
                                 showElement(this.invitedGroupsContainer);
                             }
-                            showElement(this.outSideContainer);
+                            showElement(this.outsideContainer);
                             break;
                         case 400:
                         case 500:
@@ -143,17 +143,16 @@
             setMessage(element, message);
         };
 
-        this.sendGroupParameters = function (e, button, form) {
-            e.preventDefault();
+        this.sendGroupParameters = function (e) {
             clearMessage(this.homeErrorMessage);
-            hideElement(button)
+            hideElement(this.create)
             showElement(this.loader);
             const relatedForm = e.target.closest("form");
             if (relatedForm.checkValidity()) {
                 if (this.min.value > this.max.value && this.min.value !== '' && this.max.value !== '') {
                     setMessage(this.homeErrorMessage, "Il numero minimo non può essere più grande del numero massimo!");
                     hideElement(this.loader);
-                    showElement(button);
+                    showElement(this.create);
                     return;
                 }
                 makeCall("POST", "/RichInternetApplication_war/CheckGroupParameters", relatedForm, (x) => {
@@ -169,8 +168,8 @@
                                 sessionStorage.setItem("groupMax", responseJson["max"]);
                                 sessionStorage.setItem("attempts", "0");
                                 hideElement(this.loader);
-                                resetForm(form);
-                                showElement(button);
+                                resetForm(this.groupCreation);
+                                showElement(this.create);
                                 this.pageOrchestrator.transitionToRegistry();
                                 break;
                             case 400:
@@ -178,7 +177,7 @@
                             case 502:
                                 setMessage(this.homeErrorMessage, response);
                                 hideElement(this.loader);
-                                showElement(button);
+                                showElement(this.create);
                                 break;
                             case 401:
                             case 403:
@@ -188,7 +187,7 @@
                             default:
                                 setMessage(this.homeErrorMessage, "Something went wrong");
                                 hideElement(this.loader);
-                                showElement(button);
+                                showElement(this.create);
                         }
                     }
                 }, false);
@@ -196,7 +195,7 @@
                 relatedForm.reportValidity();
                 setMessage(this.homeErrorMessage, "Tutti i campi devono essere compilati correttamente");
                 hideElement(this.loader);
-                showElement(button);
+                showElement(this.create);
             }
         }
 
@@ -208,15 +207,15 @@
             clearMessage(this.details2);
             this.invitedGroups.innerHTML = "";
             clearMessage(this.homeErrorMessage);
-            hideElement(this.outSideContainer);
+            hideElement(this.outsideContainer);
         }
     }
 
     // building the view related to group details
-    function GroupDetails(_alertBox, _title, _outSideContainer, _group, _details, _participants, _showHome, _trashBin, _pageOrchestrator) {
+    function GroupDetails(_alertBox, _title, _outsideContainer, _group, _details, _participants, _showHome, _trashBin, _pageOrchestrator) {
         this.alertBox = _alertBox;
         this.title = _title;
-        this.outSideContainer = _outSideContainer;
+        this.outsideContainer = _outsideContainer;
         this.group = _group;
         this.details = _details;
         this.participants = _participants;
@@ -254,7 +253,7 @@
                             const creator = responseAsJson["creator"];
                             const invitees = responseAsJson["invitees"];
                             resultInvitees = invitees;
-                            this.updateView(group, creator, invitees)
+                            this.updateView(creator)
                             if (sessionStorage.getItem("userUsername") === creator["username"]) {
                                 showElement(this.details);
                                 showElement(this.trashBin);
@@ -262,7 +261,7 @@
                                 hideElement(this.trashBin);
                                 hideElement(this.details);
                             }
-                            showElement(this.outSideContainer);
+                            showElement(this.outsideContainer);
                             break;
                         case 400:
                         case 500:
@@ -280,17 +279,17 @@
                 });
         }
 
-        this.updateView = function(group, creator, invitees) {
+        this.updateView = function(creator) {
             setMessage(this.title, "Dettagli del gruppo: " + group["title"]);
             this.group.innerHTML = "";
             let row = document.createElement("tr");
             const groupDetails = [
-                group["title"],
+                resultGroup["title"],
                 creator["surname"] + " " + creator["name"],
-                group["creation"],
-                group["activity"],
-                group["min"],
-                group["max"]
+                resultGroup["creation"],
+                resultGroup["activity"],
+                resultGroup["min"],
+                resultGroup["max"]
             ];
             groupDetails.forEach(detail => {
                 let cell = document.createElement("td");
@@ -317,7 +316,7 @@
                 this.participants.appendChild(row);
             };
             addParticipantRow(creator);
-            invitees.forEach(addParticipantRow);
+            resultInvitees.forEach(addParticipantRow);
         }
 
         this.removeParticipant = (groupID, participantID) => {
@@ -326,8 +325,7 @@
                 (x) => {
                     switch (x.status) {
                         case 200:
-                            clearMessage(this.title);
-                            hideElement(this.outSideContainer);
+                            this.hide();
                             this.show(groupID);
                             this.alertBox.show("Partecipante rimosso con successo");
                             break;
@@ -351,13 +349,25 @@
             clearMessage(this.title)
             this.group.innerHTML = "";
             this.participants.innerHTML = "";
-            hideElement(this.outSideContainer);
+            hideElement(this.outsideContainer);
         }
     }
 
     // building the view related to registry
-    function Registry() {
+    function Registry(_alertBox, _title, _outsideContainer, _pageOrchestrator) {
+        this.alertBox = _alertBox;
+        this.title = _title;
+        this.outsideContainer = _outsideContainer;
+        this.pageOrchestrator = _pageOrchestrator;
 
+        this.show = () => {
+
+        }
+
+        this.hide = function() {
+            clearMessage(this.title);
+            hideElement(this.outsideContainer)
+        }
     }
 
     // building the view related to cancellation
@@ -379,7 +389,7 @@
         const title = document.getElementById("title");
 
         // accessing elements related to home
-        const homeOutSideCourseContainer = document.getElementById("home");
+        const homeOutsideContainer = document.getElementById("home");
         const subtitle = document.getElementById("subtitle");
         const details1 = document.getElementById("details1");
         const createdGroupsContainer = document.getElementById("createdGroupsContainer");
@@ -395,48 +405,53 @@
         const homeErrorMessage = document.getElementById("home-error-message");
         const loader = document.getElementById("loader");
         const create = document.getElementById("create");
-        this.homePage = new HomePage(this.alertBox, title, homeOutSideCourseContainer, subtitle, details1, createdGroupsContainer,
+        this.homePage = new HomePage(this.alertBox, title, homeOutsideContainer, subtitle, details1, createdGroupsContainer,
                                      createdGroups, details2, invitedGroupsContainer, invitedGroups, groupCreation,
                                      groupTitle, activity, min, max, homeErrorMessage, loader, create, this);
 
         // accessing elements related to groupDetails
-        const detailsOutSideCourseContainer = document.getElementById("groupDetails");
+        const groupDetailsOutsideContainer = document.getElementById("groupDetails");
         const group = document.getElementById("group");
         const details = document.getElementById("details");
         const participants = document.getElementById("participants");
         const showHome = document.getElementById("show-home");
         const trashBin = document.getElementById("trash-bin");
-        this.groupDetails = new GroupDetails(this.alertBox, title, detailsOutSideCourseContainer, group, details, participants, showHome, trashBin, this);
+        this.groupDetails = new GroupDetails(this.alertBox, title, groupDetailsOutsideContainer, group, details, participants, showHome, trashBin, this);
 
         // accessing elements related to registry
-
+        const registryOutsideContainer = document.getElementById("registry");
+        this.registry = new Registry(this.alertBox, title, registryOutsideContainer, this);
 
         // accessing elements related to cancellation
 
 
         // starting the page orchestrator
         this.start = () => {
-            // instantiate and hide everything
+            // instantiate and show home
             console.log("PageOrchestrator started");
             this.transitionToHome();
         };
 
-        this.transitionToHome = ()=> {
+        this.hideAll = () => {
             this.alertBox.hide();
+            this.homePage.hide();
             this.groupDetails.hide();
+            this.registry.hide();
+        }
+
+        this.transitionToHome = () => {
+            this.hideAll();
             this.homePage.show();
         }
 
-        this.transitionToGroupDetails = (groupID)=> {
-            this.alertBox.hide();
-            this.homePage.hide();
+        this.transitionToGroupDetails = (groupID) => {
+            this.hideAll();
             this.groupDetails.show(groupID);
         }
 
-        this.transitionToRegistry = ()=> {
-            this.alertBox.hide();
-            this.homePage.hide();
-            //--------
+        this.transitionToRegistry = () => {
+            this.hideAll();
+            this.registry.show();
         }
 
         this.transitionToCancellation = () => {
