@@ -44,7 +44,7 @@
                       _homeErrorMessage, _loader, _create, _pageOrchestrator) {
         this.alertBox = _alertBox;
         this.title = _title;
-        this.outsideContainer = _container;
+        this.outsideContainer = _outsideContainer;
         this.subtitle = _subtitle;
         this.details1 = _details1;
         this.createdGroupsContainer = _createdGroupsContainer;
