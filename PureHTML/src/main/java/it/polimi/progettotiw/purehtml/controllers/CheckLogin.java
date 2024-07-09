@@ -80,7 +80,7 @@ public class CheckLogin extends HttpServlet {
         try {
             u = userDao.checkCredentials(username, password);
         } catch (SQLException e) {
-            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Couldn't perform database interrogation");
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
             return;
         }
 

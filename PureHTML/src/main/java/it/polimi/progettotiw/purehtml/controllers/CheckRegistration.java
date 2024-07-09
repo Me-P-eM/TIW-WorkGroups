@@ -90,7 +90,7 @@ public class CheckRegistration extends HttpServlet {
         try {
             usernameExists = userDao.checkUsername(username);
         } catch (SQLException e) {
-            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Couldn't perform database interrogation");
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
             return;
         }
 
@@ -102,7 +102,7 @@ public class CheckRegistration extends HttpServlet {
             try {
                 emailExists = userDao.checkEmail(email);
             } catch (SQLException e) {
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Couldn't perform database interrogation");
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
                 return;
             }
         }
@@ -115,7 +115,7 @@ public class CheckRegistration extends HttpServlet {
             try {
                 u = userDao.registerUser(username, name, surname, email, password);
             } catch (SQLException e) {
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Couldn't register user");
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
                 return;
             }
         }

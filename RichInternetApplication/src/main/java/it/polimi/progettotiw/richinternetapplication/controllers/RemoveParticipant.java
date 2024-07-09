@@ -97,7 +97,7 @@ public class RemoveParticipant extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
         if (!creator.getUsername().equals(user.getUsername())) {
@@ -112,7 +112,7 @@ public class RemoveParticipant extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
         if (!isParticipant) {
@@ -134,7 +134,7 @@ public class RemoveParticipant extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
         Group group;
@@ -143,7 +143,7 @@ public class RemoveParticipant extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
         if (currentParticipants <= group.getMin()) {
@@ -158,7 +158,7 @@ public class RemoveParticipant extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
         response.setStatus(HttpServletResponse.SC_OK);

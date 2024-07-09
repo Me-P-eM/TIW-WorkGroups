@@ -162,4 +162,11 @@
             showElement(registerButton);
         }
     });
+    // pressing enter on keyboard will start registration
+    registrationForm.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            registerButton.click();
+        }
+    });
 })();

@@ -97,7 +97,7 @@ public class GetGroupDetails extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
 
@@ -114,7 +114,7 @@ public class GetGroupDetails extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
 
@@ -124,7 +124,7 @@ public class GetGroupDetails extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
 
@@ -134,7 +134,7 @@ public class GetGroupDetails extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
 

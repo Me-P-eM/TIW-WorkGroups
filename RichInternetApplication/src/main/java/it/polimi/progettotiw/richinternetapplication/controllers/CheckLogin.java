@@ -85,7 +85,7 @@ public class CheckLogin extends HttpServlet {
             u = userDao.checkCredentials(username, password);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
 

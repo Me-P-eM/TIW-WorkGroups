@@ -94,7 +94,7 @@ public class CheckRegistration extends HttpServlet {
             usernameExists = userDao.checkUsername(username);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            response.getWriter().print("Could not access the database");
+            response.getWriter().print("Something went wrong in the database");
             return;
         }
 
@@ -107,7 +107,7 @@ public class CheckRegistration extends HttpServlet {
                 emailExists = userDao.checkEmail(email);
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
+                response.getWriter().print("Something went wrong in the database");
                 return;
             }
         }
@@ -121,7 +121,7 @@ public class CheckRegistration extends HttpServlet {
                 u = userDao.registerUser(username, name, surname, email, password);
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not register user");
+                response.getWriter().print("Something went wrong in the database");
                 return;
             }
         }

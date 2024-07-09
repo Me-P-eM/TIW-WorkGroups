@@ -156,7 +156,7 @@
             showElement(this.loader);
             const relatedForm = e.target.closest("form");
             if (relatedForm.checkValidity()) {
-                if (this.min.value > this.max.value && this.min.value !== '' && this.max.value !== '') {
+                if (parseInt(this.min.value) > parseInt(this.max.value)  && this.min.value !== '' && this.max.value !== '') {
                     setMessage(this.homeErrorMessage, "Il numero minimo non può essere più grande del numero massimo!");
                     hideElement(this.loader);
                     showElement(this.create);
