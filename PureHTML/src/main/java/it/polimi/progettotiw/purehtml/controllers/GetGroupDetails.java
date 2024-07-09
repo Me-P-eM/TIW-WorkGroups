@@ -93,46 +93,45 @@ public class GetGroupDetails extends HttpServlet {
             return;
         }
 
-        // if he's a participant, he can access group details
-        if (isParticipant) {
-            // get group information
-            try {
-                group = groupDAO.getGroupByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
-                return;
-            }
-
-            // get creator's name and surname
-            try {
-                creator = groupDAO.getCreatorByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
-                return;
-            }
-
-            // get invitees
-            try {
-                invitees = groupDAO.getInviteesByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
-                return;
-            }
-
-            String pathToResource = "WEB-INF/groupDetails.jsp";
-            RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
-            request.setAttribute("group", group);
-            request.setAttribute("creator", creator);
-            request.setAttribute("invitees", invitees);
-            dispatcher.forward(request, response);
-
         // if he's not a participant, he can't access group details
-        } else {
+        if (!isParticipant) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have access to details of this group, or this group does not exists");
+            return;
         }
+
+        // get group information
+        try {
+            group = groupDAO.getGroupByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+
+        // get creator's name and surname
+        try {
+            creator = groupDAO.getCreatorByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+
+        // get invitees
+        try {
+            invitees = groupDAO.getInviteesByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+
+        String pathToResource = "WEB-INF/groupDetails.jsp";
+        RequestDispatcher dispatcher = request.getRequestDispatcher(pathToResource);
+        request.setAttribute("group", group);
+        request.setAttribute("creator", creator);
+        request.setAttribute("invitees", invitees);
+        dispatcher.forward(request, response);
     }
 
     /**

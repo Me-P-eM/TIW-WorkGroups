@@ -10,6 +10,6 @@ public class ParameterChecker {
      * @return true if the string is valid, false if the string is null or if the string is an empty string
      */
     public static boolean checkString(String s) {
-        return s!=null && s.length()>0;
+        return s != null && !s.isEmpty();
     }
 }

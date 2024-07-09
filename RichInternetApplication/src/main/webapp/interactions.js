@@ -4,6 +4,7 @@
 {
     window.addEventListener("load", () => {
         let pageOrchestrator = new PageOrchestrator();
+
         if (sessionStorage.getItem("userUsername") == null) {
             window.location.href = "index.html";
         } else {
@@ -16,7 +17,8 @@
     // building logout
     function LogoutButton(_logoutButton) {
         this.button = _logoutButton;
-        this.button.addEventListener("click", (e) => {
+
+        this.button.addEventListener("click", () => {
             makeCall("GET", "/RichInternetApplication_war/Logout", null,
                 () => {
                     sessionStorage.clear();
@@ -28,13 +30,18 @@
     // building alert box
     function AlertBox(_container) {
         this.container = _container;
-        this.show = function(text) {
-            showElement(this.container);
+
+        this.show = function(type, text) {
+            this.hide();
             setMessage(this.container, text);
+            this.container.classList.add("alert-" + type);
+            showElement(this.container);
         }
+
         this.hide = function() {
             hideElement(this.container);
             clearMessage(this.container);
+            this.container.classList.remove("alert-success", "alert-info", "alert-warning", "alert-danger");
         };
     }
 
@@ -78,7 +85,7 @@
                             const createdGroups = responseAsJson["createdGroups"];
                             const invitedGroups = responseAsJson["invitedGroups"];
                             if (createdGroups.length === 0) {
-                                this.updateElement(this.details1, "alert alert-warning", "alert", "Non ci sono gruppi attivi che hai creato");
+                                this.updateElement(this.details1, "alert alert-info", "alert", "Non ci sono gruppi attivi che hai creato");
                                 hideElement(this.createdGroupsContainer);
                             } else {
                                 this.updateElement(this.details1, "text-decoration-underline", "", "Ecco la lista dei gruppi ancora attivi che hai creato. Seleziona un gruppo per visualizzarne i dettagli.");
@@ -86,7 +93,7 @@
                                 showElement(this.createdGroupsContainer);
                             }
                             if (invitedGroups.length === 0) {
-                                this.updateElement(this.details2, "alert alert-warning", "alert", "Non ci sono gruppi attivi a cui sei stato invitato");
+                                this.updateElement(this.details2, "alert alert-info", "alert", "Non ci sono gruppi attivi a cui sei stato invitato");
                                 hideElement(this.invitedGroupsContainer);
                             } else {
                                 this.updateElement(this.details2, "text-decoration-underline", "", "Ecco la lista dei gruppi ancora attivi a cui sei stato invitato. Seleziona un gruppo per visualizzarne i dettagli.");
@@ -98,15 +105,15 @@
                         case 400:
                         case 500:
                         case 502:
-                            this.alertBox.show(x.responseText);
+                            this.alertBox.show("warning", x.responseText);
                             break;
                         case 401:
                         case 403:
                             this.hide();
-                            this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                            this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                             break;
                         default:
-                            this.alertBox.show("Something went wrong");
+                            this.alertBox.show("danger", "Something went wrong");
                     }
                 });
         };
@@ -161,11 +168,11 @@
                         switch (x.status) {
                             case 200:
                                 let responseJson = JSON.parse(response);
-                                sessionStorage.setItem("groupCreator", responseJson["creator"]);
-                                sessionStorage.setItem("groupTitle", responseJson["title"]);
-                                sessionStorage.setItem("groupActivity", responseJson["activity"]);
-                                sessionStorage.setItem("groupMin", responseJson["min"]);
-                                sessionStorage.setItem("groupMax", responseJson["max"]);
+                                sessionStorage.setItem("groupCreator", responseJson["group"]["creator"]);
+                                sessionStorage.setItem("groupTitle", responseJson["group"]["title"]);
+                                sessionStorage.setItem("groupActivity", responseJson["group"]["activity"]);
+                                sessionStorage.setItem("groupMin", responseJson["group"]["min"]);
+                                sessionStorage.setItem("groupMax", responseJson["group"]["max"]);
                                 sessionStorage.setItem("attempts", "0");
                                 hideElement(this.loader);
                                 resetForm(this.groupCreation);
@@ -182,7 +189,7 @@
                             case 401:
                             case 403:
                                 this.hide();
-                                this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                                this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                                 break;
                             default:
                                 setMessage(this.homeErrorMessage, "Something went wrong");
@@ -190,7 +197,7 @@
                                 showElement(this.create);
                         }
                     }
-                }, false);
+                });
             } else {
                 relatedForm.reportValidity();
                 setMessage(this.homeErrorMessage, "Tutti i campi devono essere compilati correttamente");
@@ -233,12 +240,11 @@
                 const participantID = e.dataTransfer.getData("text/plain");
                 this.removeParticipant(resultGroup["groupID"], participantID);
             } else {
-                this.alertBox.show("Non puoi effettuare quest'operazione perché il numero " +
+                this.alertBox.show("warning", "Non puoi effettuare quest'operazione perché il numero " +
                     "minimo di partecipanti dev'essere rispettato");
             }
         });
-        this.showHome.addEventListener("click", (e) => {
-            e.preventDefault();
+        this.showHome.addEventListener("click", () => {
             this.pageOrchestrator.transitionToHome();
         });
 
@@ -253,6 +259,7 @@
                             const creator = responseAsJson["creator"];
                             const invitees = responseAsJson["invitees"];
                             resultInvitees = invitees;
+                            setMessage(this.title, "Dettagli del gruppo: " + resultGroup["title"]);
                             this.updateView(creator)
                             if (sessionStorage.getItem("userUsername") === creator["username"]) {
                                 showElement(this.details);
@@ -266,21 +273,20 @@
                         case 400:
                         case 500:
                         case 502:
-                            this.alertBox.show(x.responseText);
+                            this.alertBox.show("warning", x.responseText);
                             break;
                         case 401:
                         case 403:
                             this.hide();
-                            this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                            this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                             break;
                         default:
-                            this.alertBox.show("Something went wrong");
+                            this.alertBox.show("danger", "Something went wrong");
                     }
                 });
         }
 
         this.updateView = function(creator) {
-            setMessage(this.title, "Dettagli del gruppo: " + group["title"]);
             this.group.innerHTML = "";
             let row = document.createElement("tr");
             const groupDetails = [
@@ -320,27 +326,28 @@
         }
 
         this.removeParticipant = (groupID, participantID) => {
-            makeCall("POST", "/RichInternetApplication_war/RemoveParticipant?groupID=" + groupID + "&username=" + participantID,
+            const encodedUsername = encodeURIComponent(participantID);
+            makeCall("POST", "/RichInternetApplication_war/RemoveParticipant?groupID=" + groupID + "&username=" + encodedUsername,
                 null,
                 (x) => {
                     switch (x.status) {
                         case 200:
                             this.hide();
                             this.show(groupID);
-                            this.alertBox.show("Partecipante rimosso con successo");
+                            this.alertBox.show("success", "Partecipante rimosso con successo");
                             break;
                         case 400:
                         case 403:
                         case 500:
                         case 502:
-                            this.alertBox.show(x.responseText);
+                            this.alertBox.show("warning", x.responseText);
                             break;
                         case 401:
                             this.hide();
-                            this.alertBox.show("Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                            this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
                             break;
                         default:
-                            this.alertBox.show("Something went wrong");
+                            this.alertBox.show("danger", "Something went wrong");
                     }
                 });
         };
@@ -354,25 +361,180 @@
     }
 
     // building the view related to registry
-    function Registry(_alertBox, _title, _outsideContainer, _pageOrchestrator) {
+    function Registry(_alertBox, _title, _outsideContainer, _closeButton, _groupModalDescription1, _groupModalDescription2,
+                      _userList, _attempts, _errorMessageModal, _clearSelection, _submitSelection, _pageOrchestrator) {
         this.alertBox = _alertBox;
         this.title = _title;
         this.outsideContainer = _outsideContainer;
+        this.closeButton = _closeButton;
+        this.groupModalDescription1 = _groupModalDescription1;
+        this.groupModalDescription2 = _groupModalDescription2;
+        this.userList = _userList;
+        this.attempts = _attempts;
+        this.errorMessageModal = _errorMessageModal;
+        this.clearSelection = _clearSelection;
+        this.submitSelection = _submitSelection;
         this.pageOrchestrator = _pageOrchestrator;
 
-        this.show = () => {
+        this.closeButton.addEventListener("click", () => {
+            this.pageOrchestrator.transitionToHome();
+        });
+        this.clearSelection.addEventListener("click", (e) => {
+            e.preventDefault();
+            const checkboxes = this.userList.querySelectorAll("input[type='checkbox']");
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        })
+        this.submitSelection.addEventListener("click", (e) => {
+            e.preventDefault();
+            this.submit();
+        })
 
+        this.show = () => {
+            makeCall("GET", "/RichInternetApplication_war/GoToRegistry", null,
+                (x) => {
+                    switch(x.status) {
+                        case 200:
+                            setMessage(this.groupModalDescription1, "Creazione del gruppo: " + sessionStorage.getItem("groupTitle"));
+                            setMessage(this.groupModalDescription2, "Giorni di attività: " + sessionStorage.getItem("groupActivity") +
+                                                                             ", Partecipanti minimi: " + sessionStorage.getItem("groupMin") +
+                                                                             ", Partecipanti massimi: " + sessionStorage.getItem("groupMax"));
+                            const responseAsJson = JSON.parse(x.responseText);
+                            const users = responseAsJson["users"];
+                            this.updateUsers(users);
+                            setMessage(this.attempts, "Tentativi rimasti: 3");
+                            showElement(this.outsideContainer);
+                            break;
+                        case 400:
+                        case 500:
+                        case 502:
+                            this.alertBox.show("warning", x.responseText);
+                            break;
+                        case 401:
+                        case 403:
+                            this.hide();
+                            this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                            break;
+                        default:
+                            this.alertBox.show("danger", "Something went wrong");
+                    }
+                });
+        }
+
+        this.updateUsers = (users) => {
+            this.userList.innerHTML = "";
+            users.forEach((user) => {
+                let row = document.createElement("tr");
+                let selectCell = document.createElement("td");
+                let selectCheckbox = document.createElement("input");
+                selectCheckbox.type = "checkbox";
+                selectCheckbox.className = "form-check-input";
+                selectCheckbox.value = user["username"];
+                selectCell.appendChild(selectCheckbox);
+                row.appendChild(selectCell);
+                let surnameCell = document.createElement("td");
+                surnameCell.appendChild(document.createTextNode(user["surname"]));
+                row.appendChild(surnameCell);
+                let nameCell = document.createElement("td");
+                nameCell.appendChild(document.createTextNode(user["name"]));
+                row.appendChild(nameCell);
+                this.userList.appendChild(row);
+            });
+        };
+
+        this.submit = function() {
+            const selectedUsers = [];
+            const checkboxes = this.userList.querySelectorAll("input[type='checkbox']:checked");
+            checkboxes.forEach(checkbox => {
+                selectedUsers.push(checkbox.value);
+            });
+            if (sessionStorage.getItem("attempts") === null || sessionStorage.getItem("groupTitle") === null) {
+                this.pageOrchestrator.transitionToHome();
+                this.alertBox.show("warning", "Badly formatted request parameters");
+            }
+            let validSelection = true;
+            if (selectedUsers.length+1 < sessionStorage.getItem("groupMin")) {
+                validSelection = false;
+                setMessage(this.errorMessageModal, "Troppo pochi utenti selezionati, aggiungerne almeno " +
+                                                            (sessionStorage.getItem("groupMin") - (selectedUsers.length+1)))
+            } else if (selectedUsers.length+1 > sessionStorage.getItem("groupMax")) {
+                validSelection = false;
+                setMessage(this.errorMessageModal, "Troppi utenti selezionati, eliminarne almeno " +
+                                                            ((selectedUsers.length+1) - sessionStorage.getItem("groupMax")))
+            }
+            let attempts = parseInt(sessionStorage.getItem("attempts"));
+            if (!validSelection) {
+                attempts++;
+                sessionStorage.setItem("attempts", attempts.toString());
+                setMessage(this.attempts, "Tentativi rimasti: " + (3 - attempts));
+            }
+            if (attempts < 3) {
+                makeJsonCall("POST", "/RichInternetApplication_war/CheckInvitees", selectedUsers,
+                    (x) => {
+                        switch (x.status) {
+                            case 200:
+                                sessionStorage.removeItem("groupCreator");
+                                sessionStorage.removeItem("groupTitle");
+                                sessionStorage.removeItem("groupActivity",);
+                                sessionStorage.removeItem("groupMin");
+                                sessionStorage.removeItem("groupMax");
+                                sessionStorage.removeItem("attempts");
+                                this.pageOrchestrator.transitionToHome();
+                                this.alertBox.show("success", x.responseText);
+                                break;
+                            case 400:
+                            case 500:
+                            case 502:
+                                setMessage(this.errorMessageModal, x.responseText);
+                                break;
+                            case 401:
+                            case 403:
+                                this.hide();
+                                this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                                break;
+                            default:
+                                setMessage(this.errorMessageModal, "Something went wrong");
+                        }
+                    });
+            } else {
+                sessionStorage.removeItem("groupCreator");
+                sessionStorage.removeItem("groupTitle");
+                sessionStorage.removeItem("groupActivity",);
+                sessionStorage.removeItem("groupMin");
+                sessionStorage.removeItem("groupMax");
+                sessionStorage.removeItem("attempts");
+                this.pageOrchestrator.transitionToCancellation();
+            }
         }
 
         this.hide = function() {
-            clearMessage(this.title);
+            clearMessage(this.groupModalDescription1);
+            clearMessage(this.groupModalDescription2);
+            this.userList.innerHTML = "";
+            clearMessage(this.attempts);
+            clearMessage(this.errorMessageModal);
             hideElement(this.outsideContainer)
         }
     }
 
     // building the view related to cancellation
-    function Cancellation() {
+    function Cancellation(_outsideContainer, _homeButton, _pageOrchestrator) {
+        this.outsideContainer = _outsideContainer;
+        this.homeButton = _homeButton;
+        this.pageOrchestrator = _pageOrchestrator;
 
+        this.homeButton.addEventListener("click", () => {
+            this.pageOrchestrator.transitionToHome();
+        });
+
+        this.show = () => {
+            showElement(this.outsideContainer);
+        }
+
+        this.hide = function () {
+            hideElement(this.outsideContainer);
+        }
     }
 
     // finally the page orchestrator is built
@@ -416,14 +578,27 @@
         const participants = document.getElementById("participants");
         const showHome = document.getElementById("show-home");
         const trashBin = document.getElementById("trash-bin");
-        this.groupDetails = new GroupDetails(this.alertBox, title, groupDetailsOutsideContainer, group, details, participants, showHome, trashBin, this);
+        this.groupDetails = new GroupDetails(this.alertBox, title, groupDetailsOutsideContainer, group, details, participants,
+                                             showHome, trashBin, this);
 
         // accessing elements related to registry
         const registryOutsideContainer = document.getElementById("registry");
-        this.registry = new Registry(this.alertBox, title, registryOutsideContainer, this);
+        const closeButton = document.getElementById("closeButton");
+        const groupModalDescription1 = document.getElementById("groupModalDescription1");
+        const groupModalDescription2 = document.getElementById("groupModalDescription2");
+        const userList = document.getElementById("userList");
+        const attempts = document.getElementById("attempts");
+        const errorMessageModal = document.getElementById("errorMessageModal");
+        const clearSelection = document.getElementById("clearSelection");
+        const submitSelection = document.getElementById("submitSelection");
+        this.registry = new Registry(this.alertBox, title, registryOutsideContainer, closeButton, groupModalDescription1,
+                                     groupModalDescription2, userList, attempts, errorMessageModal,
+                                     clearSelection, submitSelection, this);
 
         // accessing elements related to cancellation
-
+        const cancellationOutsideContainer = document.getElementById("cancellation");
+        const homeButton = document.getElementById("return-home");
+        this.cancellation = new Cancellation(cancellationOutsideContainer, homeButton, this);
 
         // starting the page orchestrator
         this.start = () => {
@@ -433,10 +608,11 @@
         };
 
         this.hideAll = () => {
-            this.alertBox.hide();
             this.homePage.hide();
             this.groupDetails.hide();
             this.registry.hide();
+            this.cancellation.hide();
+            this.alertBox.hide();
         }
 
         this.transitionToHome = () => {
@@ -450,12 +626,12 @@
         }
 
         this.transitionToRegistry = () => {
-            this.hideAll();
             this.registry.show();
         }
 
         this.transitionToCancellation = () => {
-            //---------------
+            this.hideAll();
+            this.cancellation.show();
         }
     }
 }

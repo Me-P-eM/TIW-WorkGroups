@@ -88,6 +88,7 @@ public class RemoveParticipant extends HttpServlet {
         User user = (User) session.getAttribute("user");
         String participant = request.getParameter("username");
         User creator;
+        boolean isParticipant;
         GroupDAO groupDAO = new GroupDAO(connection);
 
         // check that the requester is the creator of the group
@@ -103,6 +104,27 @@ public class RemoveParticipant extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().print("You must be the creator of the group in order to remove a participant");
             return;
+        }
+
+        // check that the user to remove is a participant
+        try {
+            isParticipant = groupDAO.checkParticipant(groupID, participant);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+        if (!isParticipant) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("Badly formatted request parameters");
+            return;
+        }
+
+        // check that the user to remove is not the creator
+        if (participant.equals(creator.getUsername())) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("You can't remove the creator");
         }
 
         // check if the minimum number of participants is respected

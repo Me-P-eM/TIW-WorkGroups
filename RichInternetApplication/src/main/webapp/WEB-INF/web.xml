@@ -41,6 +41,7 @@
         <filter-name>LoginChecker</filter-name>
         <url-pattern>/GoToHome</url-pattern>
         <url-pattern>/GetGroupDetails</url-pattern>
+        <url-pattern>/RemoveParticipant</url-pattern>
         <url-pattern>/CheckGroupParameters</url-pattern>
         <url-pattern>/GoToRegistry</url-pattern>
         <url-pattern>/CheckInvitees</url-pattern>

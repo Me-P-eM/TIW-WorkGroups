@@ -101,55 +101,53 @@ public class GetGroupDetails extends HttpServlet {
             return;
         }
 
-        // if he's a participant, he can access group details
-        if (isParticipant) {
-            // get group information
-            try {
-                group = groupDAO.getGroupByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
-                return;
-            }
-
-            // get creator's username, name and surname
-            try {
-                creator = groupDAO.getCreatorByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
-                return;
-            }
-
-            // get invitees
-            try {
-                invitees = groupDAO.getInviteesByGroupID(groupID);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Could not access the database");
-                return;
-            }
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).setPrettyPrinting().create();
-            JsonObject jsonResponse = new JsonObject();
-            jsonResponse.add("group", gson.toJsonTree(group));
-            jsonResponse.add("creator", gson.toJsonTree(creator));
-            JsonArray inviteesArray = gson.toJsonTree(invitees).getAsJsonArray();
-            jsonResponse.add("invitees", inviteesArray);
-            response.getWriter().print(gson.toJson(jsonResponse));
-
-
         // if he's not a participant, he can't access group details
-        } else {
+        if (!isParticipant) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().print("You do not have access to details of this group, or this group does not exists");
+            return;
         }
+
+        // get group information
+        try {
+            group = groupDAO.getGroupByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+
+        // get creator's username, name and surname
+        try {
+            creator = groupDAO.getCreatorByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+
+        // get invitees
+        try {
+            invitees = groupDAO.getInviteesByGroupID(groupID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Could not access the database");
+            return;
+        }
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).setPrettyPrinting().create();
+        JsonObject jsonResponse = new JsonObject();
+        jsonResponse.add("group", gson.toJsonTree(group));
+        jsonResponse.add("creator", gson.toJsonTree(creator));
+        JsonArray inviteesArray = gson.toJsonTree(invitees).getAsJsonArray();
+        jsonResponse.add("invitees", inviteesArray);
+        response.getWriter().print(gson.toJson(jsonResponse));
     }
 
     /**

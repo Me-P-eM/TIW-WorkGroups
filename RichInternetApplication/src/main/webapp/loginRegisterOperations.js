@@ -85,7 +85,7 @@
                             showElement(loginButton);
                     }
                 }
-            }, false);
+            });
         } else {
             relatedForm.reportValidity();
             setMessage(errorMessage, "Tutti i campi devono essere compilati correttamente");
@@ -153,7 +153,7 @@
                             showElement(registerButton);
                     }
                 }
-            }, false);
+            });
         } else {
             relatedForm.reportValidity();
             setMessage(regErrorMessage, "Tutti i campi devono essere compilati correttamente");

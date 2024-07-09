@@ -1,8 +1,8 @@
 /**
  * Call management (AJAX)
  */
-function makeCall(method, url, formElement, cback, reset = true) {
-    let req = new XMLHttpRequest();
+function makeCall(method, url, formElement, cback) {
+    const req = new XMLHttpRequest();
     req.onreadystatechange = function() {
         if (req.readyState === 4) {
             cback(req);
@@ -14,10 +14,20 @@ function makeCall(method, url, formElement, cback, reset = true) {
     } else {
         req.send(new FormData(formElement));
     }
-    if (formElement !== null && reset === true) {
-        formElement.reset();
-    }
 }
+
+function makeJsonCall(method, url, jsonBody, cback) {
+    const req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (req.readyState === 4) {
+            cback(req);
+        }
+    }; // closure
+    req.open(method, url);
+    req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    req.send(JSON.stringify(jsonBody));
+}
+
 
 function showElement(element) {
     element.removeAttribute("style");

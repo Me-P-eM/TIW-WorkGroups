@@ -247,12 +247,11 @@ public class GroupDAO {
      * @param groupID the id of the group
      * @throws SQLException
      */
-    public void setInvitees(List<String> invitees, int groupID) throws SQLException {
+    private void setInvitees(List<String> invitees, int groupID) throws SQLException {
         String query =
                 "INSERT INTO invitation (userID, groupID) " +
                 "VALUES (?, ?)";
         try {
-            connection.setAutoCommit(false);
             PreparedStatement p = connection.prepareStatement(query);
             for (String invitee : invitees) {
                 p.setString(1, invitee);
@@ -276,8 +275,6 @@ public class GroupDAO {
             connection.rollback();
             e.printStackTrace();
             throw new SQLException(e);
-        } finally {
-            connection.setAutoCommit(true);
         }
     }
 

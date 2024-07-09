@@ -76,7 +76,7 @@
                 </div>
                 <c:if test="${not empty requestScope.errorMessage}">
                 <div class="text-center row lateral-margin">
-                    <div id="error-message" class="error-message bottom-margin">
+                    <div id="error-message" class="error-message">
                         <p><c:out value="${requestScope.errorMessage}" /></p>
                     </div>
                 </div>
