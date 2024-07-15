@@ -110,25 +110,8 @@ public class CheckRegistration extends HttpServlet {
         // check password
         boolean validPassword = password.equals(passwordCheck);
 
-        // if everything is correct, try register user in the database
-        if (!usernameExists && !emailExists && validPassword) {
-            try {
-                u = userDao.registerUser(username, name, surname, email, password);
-            } catch (SQLException e) {
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
-                return;
-            }
-        }
-
-        // registration went OK
-        if (u != null) {
-            s.setAttribute("user", u);
-            System.out.println("Setting http session ...");
-            String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
-            response.sendRedirect(redirectionPath);
-
-        // registration was not possible due to parameters problems
-        } else {
+        // if there are problems due to parameters, don't register user
+        if (usernameExists || emailExists || !validPassword) {
             System.out.println("Registration was not successful");
             if (usernameExists) {
                 System.out.println("Username already exists");
@@ -152,7 +135,20 @@ public class CheckRegistration extends HttpServlet {
             request.setAttribute("password", password);
             request.setAttribute("passwordCheck", passwordCheck);
             request.getRequestDispatcher("/registration.jsp").forward(request, response);
+            return;
         }
+
+        // parameters are OK
+        try {
+            u = userDao.registerUser(username, name, surname, email, password);
+        } catch (SQLException e) {
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+        s.setAttribute("user", u);
+        System.out.println("Setting http session ...");
+        String redirectionPath = getServletContext().getContextPath() + "/GoToHome";
+        response.sendRedirect(redirectionPath);
     }
 
     public void destroy() {

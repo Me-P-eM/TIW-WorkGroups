@@ -115,29 +115,8 @@ public class CheckRegistration extends HttpServlet {
         // check password
         boolean validPassword = password.equals(passwordCheck);
 
-        // if everything is correct, try register user in the database
-        if (!usernameExists && !emailExists && validPassword) {
-            try {
-                u = userDao.registerUser(username, name, surname, email, password);
-            } catch (SQLException e) {
-                response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-                response.getWriter().print("Something went wrong in the database");
-                return;
-            }
-        }
-
-        // registration went OK
-        if (u != null) {
-            s.setAttribute("user", u);
-            System.out.println("Setting http session ...");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            Gson g = new Gson();
-            response.getWriter().print(g.toJson(u));
-
-        // registration was not possible due to parameters problems
-        } else {
+        // if there are problems due to parameters, don't register user
+        if (usernameExists || emailExists || !validPassword) {
             System.out.println("Registration was not successful");
             if (usernameExists) {
                 System.out.println("Username already exists");
@@ -156,12 +135,27 @@ public class CheckRegistration extends HttpServlet {
                 response.getWriter().print("Email already exists");
                 return;
             }
-            if (!validPassword) {
-                System.out.println("Password does not match");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().print("Passwords do not match");
-            }
+            System.out.println("Password does not match");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("Passwords do not match");
+            return;
         }
+
+        // parameters are OK
+        try {
+            u = userDao.registerUser(username, name, surname, email, password);
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().print("Something went wrong in the database");
+            return;
+        }
+        s.setAttribute("user", u);
+        System.out.println("Setting http session ...");
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson g = new Gson();
+        response.getWriter().print(g.toJson(u));
     }
 
     public void destroy() {

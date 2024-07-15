@@ -52,7 +52,7 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <p class="alert alert-warning" role="alert">Non ci sono gruppi attivi che hai creato</p>
+                        <p class="alert alert-info" role="alert">Non ci sono gruppi attivi che hai creato</p>
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -87,7 +87,7 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <p class="alert alert-warning" role="alert">Non ci sono gruppi attivi a cui sei stato invitato</p>
+                        <p class="alert alert-info" role="alert">Non ci sono gruppi attivi a cui sei stato invitato</p>
                     </c:otherwise>
                 </c:choose>
             </div>
