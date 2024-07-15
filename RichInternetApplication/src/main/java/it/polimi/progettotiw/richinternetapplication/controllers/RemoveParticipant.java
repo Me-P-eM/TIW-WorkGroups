@@ -123,7 +123,7 @@ public class RemoveParticipant extends HttpServlet {
 
         // check that the user to remove is not the creator
         if (participant.equals(creator.getUsername())) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().print("You can't remove the creator");
         }
 
@@ -147,7 +147,7 @@ public class RemoveParticipant extends HttpServlet {
             return;
         }
         if (currentParticipants <= group.getMin()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().println("Non puoi effettuare quest'operazione perché il numero minimo di partecipanti dev'essere rispettato");
             return;
         }
