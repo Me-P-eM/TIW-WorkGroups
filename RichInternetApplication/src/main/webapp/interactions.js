@@ -403,7 +403,7 @@
                             const responseAsJson = JSON.parse(x.responseText);
                             const users = responseAsJson["users"];
                             this.updateUsers(users);
-                            setMessage(this.attempts, "Tentativi rimasti: 3");
+                            setMessage(this.attempts, "Tentativi rimasti: " + (3 - sessionStorage.getItem("attempts")));
                             showElement(this.outsideContainer);
                             break;
                         case 400:
