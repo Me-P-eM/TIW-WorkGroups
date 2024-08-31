@@ -161,6 +161,11 @@
                     hideElement(this.loader);
                     showElement(this.create);
                     return;
+                } else if (!checkLength(this.groupTitle.value)) {
+                    setMessage(this.homeErrorMessage, "Il titolo può contenere un massimo di 45 caratteri");
+                    hideElement(this.loader);
+                    showElement(this.create);
+                    return;
                 }
                 makeCall("POST", "/RichInternetApplication_war/CheckGroupParameters", relatedForm, (x) => {
                     if (x.readyState === XMLHttpRequest.DONE) {

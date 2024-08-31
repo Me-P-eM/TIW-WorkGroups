@@ -74,22 +74,26 @@ public class CheckGroupParameters extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
             return;
         }
+        if (!ParameterChecker.checkStringLength(request.getParameter("title"))) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Title must have a maximum of 45 characters");
+            return;
+        }
         try {
             activity = Integer.parseInt(request.getParameter("activity"));
         } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The activity you submitted for the group is not a number");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The activity you submitted for the group is not an integer number");
             return;
         }
         try {
             min = Integer.parseInt(request.getParameter("min"));
         } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The minimum you submitted for the group is not a number");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The minimum you submitted for the group is not an integer number");
             return;
         }
         try {
             max = Integer.parseInt(request.getParameter("max"));
         } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The maximum you submitted for the group is not a number");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The maximum you submitted for the group is not an integer number");
             return;
         }
         if (activity < 1) {

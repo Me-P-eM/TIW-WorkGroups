@@ -16,8 +16,8 @@ import javax.servlet.http.HttpSession;
 
 import it.polimi.progettotiw.purehtml.beans.User;
 import it.polimi.progettotiw.purehtml.dao.UserDAO;
+import it.polimi.progettotiw.purehtml.util.EmailValidator;
 import it.polimi.progettotiw.purehtml.util.ParameterChecker;
-import org.apache.commons.validator.routines.EmailValidator;
 
 /**
  * Servlet implementation class CheckRegistration
@@ -74,6 +74,15 @@ public class CheckRegistration extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Badly formatted request parameters");
             return;
         }
+        if (!ParameterChecker.checkStringLength(request.getParameter("name"))
+                || !ParameterChecker.checkStringLength(request.getParameter("surname"))
+                || !ParameterChecker.checkStringLength(request.getParameter("username"))
+                || !ParameterChecker.checkStringLength(request.getParameter("email"))
+                || !ParameterChecker.checkStringLength(request.getParameter("password"))
+                || !ParameterChecker.checkStringLength(request.getParameter("passwordCheck"))) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Inputs must have a maximum of 45 characters");
+            return;
+        }
 
         HttpSession s = request.getSession(true);
         String name = request.getParameter("name");
@@ -97,7 +106,7 @@ public class CheckRegistration extends HttpServlet {
         // check email
         boolean validEmail;
         boolean emailExists = true;
-        validEmail = EmailValidator.getInstance(true).isValid(email);
+        validEmail = EmailValidator.isValidEmail(email);
         if (validEmail) {
             try {
                 emailExists = userDao.checkEmail(email);

@@ -43,7 +43,7 @@
                             <div class="form-group">
                                 <label for="email">Inserisci la tua email</label>
                                 <br>
-                                <input id="email" type="text" name="email" placeholder="Email" required value="${requestScope.email}">
+                                <input id="email" type="email" name="email" placeholder="Email" required value="${requestScope.email}">
                             </div>
                         </div>
                     </div>

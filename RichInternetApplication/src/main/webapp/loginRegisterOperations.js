@@ -103,10 +103,19 @@
         showElement(regLoader);
         const relatedForm = e.target.closest("form");
         if (relatedForm.checkValidity()) {
+            const name = relatedForm.querySelector("#name").value;
+            const surname = relatedForm.querySelector("#surname").value;
+            const username = relatedForm.querySelector("#reg-username").value;
             const email = relatedForm.querySelector("#email").value;
             const password = relatedForm.querySelector("#reg-password").value;
             const passwordCheck = relatedForm.querySelector("#passwordCheck").value;
             let isValid = true;
+            // check inputs length
+            if (!checkLength(name) || !checkLength(surname) || !checkLength(username)
+                    || !checkLength(email) || !checkLength(password) || !checkLength(passwordCheck)) {
+                setMessage(regErrorMessage, "Gli input possono avere un massimo di 45 caratteri");
+                isValid = false;
+            }
             // check email syntactic validity and password equality
             if (!isValidEmail(email)) {
                 setMessage(errorMessageEmail, "Email non valida");

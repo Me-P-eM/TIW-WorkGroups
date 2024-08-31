@@ -3,8 +3,8 @@ package it.polimi.progettotiw.richinternetapplication.controllers;
 import com.google.gson.Gson;
 import it.polimi.progettotiw.richinternetapplication.beans.User;
 import it.polimi.progettotiw.richinternetapplication.dao.UserDAO;
+import it.polimi.progettotiw.richinternetapplication.util.EmailValidator;
 import it.polimi.progettotiw.richinternetapplication.util.ParameterChecker;
-import org.apache.commons.validator.routines.EmailValidator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -77,6 +77,16 @@ public class CheckRegistration extends HttpServlet {
             response.getWriter().print("Badly formatted request parameters");
             return;
         }
+        if (!ParameterChecker.checkStringLength(request.getParameter("name"))
+                || !ParameterChecker.checkStringLength(request.getParameter("surname"))
+                || !ParameterChecker.checkStringLength(request.getParameter("reg-username"))
+                || !ParameterChecker.checkStringLength(request.getParameter("email"))
+                || !ParameterChecker.checkStringLength(request.getParameter("reg-password"))
+                || !ParameterChecker.checkStringLength(request.getParameter("passwordCheck"))) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("Inputs must have a maximum of 45 characters");
+            return;
+        }
 
         HttpSession s = request.getSession(true);
         String name = request.getParameter("name");
@@ -101,7 +111,7 @@ public class CheckRegistration extends HttpServlet {
         // check email
         boolean validEmail;
         boolean emailExists = true;
-        validEmail = EmailValidator.getInstance(true).isValid(email);
+        validEmail = EmailValidator.isValidEmail(email);
         if (validEmail) {
             try {
                 emailExists = userDao.checkEmail(email);

@@ -68,7 +68,7 @@ public class GetGroupDetails extends HttpServlet {
         try {
             groupID = Integer.parseInt(request.getParameter("groupID"));
         } catch(NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The id you submitted for the group is not a number");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The id you submitted for the group is not an integer number");
             return;
         }
         if (groupID < 1) {
