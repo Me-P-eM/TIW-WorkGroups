@@ -254,41 +254,45 @@
         });
 
         this.show = (groupID) => {
-            makeCall("GET", "/RichInternetApplication_war/GetGroupDetails?groupID=" + groupID, null,
-                (x) => {
-                    switch(x.status) {
-                        case 200:
-                            const responseAsJson = JSON.parse(x.responseText);
-                            const group = responseAsJson["group"];
-                            resultGroup = group;
-                            const creator = responseAsJson["creator"];
-                            const invitees = responseAsJson["invitees"];
-                            resultInvitees = invitees;
-                            setMessage(this.title, "Dettagli del gruppo: " + resultGroup["title"]);
-                            this.updateView(creator)
-                            if (sessionStorage.getItem("userUsername") === creator["username"]) {
-                                showElement(this.details);
-                                showElement(this.trashBin);
-                            } else {
-                                hideElement(this.trashBin);
-                                hideElement(this.details);
-                            }
-                            showElement(this.outsideContainer);
-                            break;
-                        case 400:
-                        case 500:
-                        case 502:
-                            this.alertBox.show("warning", x.responseText);
-                            break;
-                        case 401:
-                        case 403:
-                            this.hide();
-                            this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
-                            break;
-                        default:
-                            this.alertBox.show("danger", "Something went wrong");
-                    }
-                });
+            if (groupID != null && groupID !== "" && groupID > 0 && Number.isInteger(groupID)) {
+                makeCall("GET", "/RichInternetApplication_war/GetGroupDetails?groupID=" + groupID, null,
+                    (x) => {
+                        switch (x.status) {
+                            case 200:
+                                const responseAsJson = JSON.parse(x.responseText);
+                                const group = responseAsJson["group"];
+                                resultGroup = group;
+                                const creator = responseAsJson["creator"];
+                                const invitees = responseAsJson["invitees"];
+                                resultInvitees = invitees;
+                                setMessage(this.title, "Dettagli del gruppo: " + resultGroup["title"]);
+                                this.updateView(creator)
+                                if (sessionStorage.getItem("userUsername") === creator["username"]) {
+                                    showElement(this.details);
+                                    showElement(this.trashBin);
+                                } else {
+                                    hideElement(this.trashBin);
+                                    hideElement(this.details);
+                                }
+                                showElement(this.outsideContainer);
+                                break;
+                            case 400:
+                            case 500:
+                            case 502:
+                                this.alertBox.show("warning", x.responseText);
+                                break;
+                            case 401:
+                            case 403:
+                                this.hide();
+                                this.alertBox.show("danger", "Non sei autorizzato a vedere questa pagina. Premi sul bottone di logout");
+                                break;
+                            default:
+                                this.alertBox.show("danger", "Something went wrong");
+                        }
+                    });
+            } else {
+                this.alertBox.show("danger", "Non è stato inserito un ID valido per il gruppo");
+            }
         }
 
         this.updateView = function(creator) {
@@ -462,11 +466,11 @@
             if (selectedUsers.length+1 < sessionStorage.getItem("groupMin")) {
                 validSelection = false;
                 setMessage(this.errorMessageModal, "Troppo pochi utenti selezionati, aggiungerne almeno " +
-                                                            (sessionStorage.getItem("groupMin") - (selectedUsers.length+1)))
+                    (sessionStorage.getItem("groupMin") - (selectedUsers.length+1)))
             } else if (selectedUsers.length+1 > sessionStorage.getItem("groupMax")) {
                 validSelection = false;
                 setMessage(this.errorMessageModal, "Troppi utenti selezionati, eliminarne almeno " +
-                                                            ((selectedUsers.length+1) - sessionStorage.getItem("groupMax")))
+                    ((selectedUsers.length+1) - sessionStorage.getItem("groupMax")))
             }
             let attempts = parseInt(sessionStorage.getItem("attempts"));
             if (!validSelection) {

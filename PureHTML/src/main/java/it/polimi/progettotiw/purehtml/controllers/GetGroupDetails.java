@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -105,6 +106,13 @@ public class GetGroupDetails extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Something went wrong in the database");
+            return;
+        }
+
+        // check if the group is active
+        LocalDate endDate = group.getCreation().plusDays(group.getActivity());
+        if (LocalDate.now().isEqual(endDate) || LocalDate.now().isAfter(endDate)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "This group is not active anymore");
             return;
         }
 

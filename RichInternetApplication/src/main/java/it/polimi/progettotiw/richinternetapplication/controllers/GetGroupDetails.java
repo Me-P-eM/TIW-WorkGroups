@@ -118,6 +118,13 @@ public class GetGroupDetails extends HttpServlet {
             return;
         }
 
+        // check if the group is active
+        LocalDate endDate = group.getCreation().plusDays(group.getActivity());
+        if (LocalDate.now().isEqual(endDate) || LocalDate.now().isAfter(endDate)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "This group is not active anymore");
+            return;
+        }
+
         // get creator's username, name and surname
         try {
             creator = groupDAO.getCreatorByGroupID(groupID);
