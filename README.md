@@ -1,12 +1,18 @@
 # Gruppi di lavoro
-## Versione pure HTML
+Progetto finale di **"Tecnologie Informatiche per il Web"**, corso di **"Ingegneria Informatica"** tenuto presso il Politecnico di Milano (2024).
+
+**Professore:** Piero Fraternali
+
+**Voto finale**: 30/30
+## Specifiche del progetto
+### Versione pure HTML
 Un’applicazione web consente la gestione di gruppi di lavoro. L’applicazione supporta registrazione e login mediante una pagina pubblica con opportune form. La registrazione controlla la validità sintattica dell’indirizzo di email e l’uguaglianza tra i campi “password” e “ripeti password”. La registrazione controlla l’unicità dello username.
 
 Un gruppo ha un titolo, una data di creazione, una durata dell’attività in giorni e un numero minimo e massimo di partecipanti. L’utente fa il login e, se autenticato, accede all’HOME page che mostra l’elenco dei gruppi creati da lui e ancora attivi, l’elenco delle gruppi cui è stato invitato e ancora attivi, e una form per creare un nuovo gruppo.
 
 Quando l’utente seleziona un gruppo compare una pagina DETTAGLI GRUPPO che mostra i dati del gruppo e la lista degli utenti partecipanti identificati da nome e cognome. Quando l’utente inoltra la form di creazione di un nuovo gruppo con il bottone INVIA, appare una pagina ANAGRAFICA con l’elenco degli utenti registrati identificati da nome e cognome e ordinata alfabeticamente per cognome crescente.
 L’utente può scegliere uno o più partecipanti dall’elenco e premere il bottone INVITA per invitarli al gruppo. Se il numero d’invitati è inferiore di X unità rispetto al minimo ammissibile, appare di nuovo la pagina ANAGRAFICA con un messaggio “Troppo pochi utenti selezionati, aggiungerne almeno X”. Gli utenti precedentemente selezionati devono rimanere selezionati, ma possono essere sostituiti, in tutto o in parte, da altri utenti. Se il numero d’invitati è superiore di X unità rispetto al massimo ammissibile, appare di nuovo la pagina ANAGRAFICA con un messaggio “Troppi utenti selezionati, eliminarne almeno X”. In questo caso, la pagina evidenzia nell’elenco gli utenti scelti in precedenza come preselezionati, in modo che l’utente possa deselezionarne alcuni. Se alla pressione del bottone INVITA il numero d’invitati rispetta i vincoli, il gruppo è memorizzato nella base di dati e associato agli utenti invitati e l’utente è rimandato alla HOME PAGE. Al terzo tentativo scorretto di assegnare un numero errato di invitati a un gruppo appare una pagina CANCELLAZIONE con un messaggio “Tre tentativi di definire un gruppo con un numero di partecipanti errato, il gruppo non sarà creato” e un link per tornare all’HOME PAGE. In questo caso il gruppo NON è memorizzato nella base di dati. L’applicazione non deve registrare nella base di dati gruppi con numero errato di partecipanti. L’applicazione consente il logout dell’utente.
-## Versione con JavaScript
+### Versione con JavaScript
 Si realizzi un’applicazione client-server web che modifica le specifiche precedenti come segue:
 - L’applicazione supporta registrazione e login mediante una pagina pubblica con opportune form. La registrazione controlla la validità sintattica dell’indirizzo di email e l’uguaglianza tra i campi “password” e “ripeti password”, anche a lato client. La registrazione controlla l’unicità dello username.
 - Dopo il login dell’utente, l’intera applicazione è realizzata con un’unica pagina.
