@@ -1,7 +1,7 @@
 # Gruppi di lavoro
 Progetto finale di **"Tecnologie Informatiche per il Web"**, corso di **"Ingegneria Informatica"** tenuto presso il Politecnico di Milano (2024).
 
-**Professore:** Piero Fraternali
+**Professore:** Fraternali Piero
 
 **Voto finale**: 30/30
 ## Specifiche del progetto
